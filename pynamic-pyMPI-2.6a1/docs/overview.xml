@@ -1,0 +1,44 @@
+<?xml encoding='UTF-8'?>
+<report title="pyMPI review" author="Pat Miller" institution="CASC" dateline="April 2003" > 
+
+<section title="Startup">
+
+pyMPI assumes a simple MPI startup and then continues through the
+normal Py_Main() API call. The basic implementation provides a simple
+main.c that calls <bold>MPI_Init()</bold>,
+<bold>pyMPI_Initialize</bold>, <bold>Py_Main()</bold>, and
+<bold>MPI_Finalize</bold>.  MPI has to be initialized very early in
+this process as the standard (cite[]) indicates that conforming implementations
+do not have to duplicate open file descriptors and the like.  Indeed,
+MPICH isn't portably happy unless you call MPI_Init() before opening
+any files.  This precludes a pyMPI that runs serially until the
+import mpi statement magically starts a parallel run (even though
+this actually works with some combinations of MPI and OS, e.g. LAM-MPI
+and Linux).
+
+The MPI interface is installed as a builtin Python module (Added in
+pyMPI_Initialize via the PyImport_AppendInittab() call).  It
+initializes automatically from within Py_Main() during the first call
+to isatty() after Python initializes.
+
+The isatty() call has to be overridden anyway to get AIX/POE to
+work right in any case.  It is also invoked several times in
+Python startup when checking for an interactive TTY to
+print the startup message, when it initializes readline, etc...
+
+Once the mpi module is invoked, it loads a series of "plugins" that
+set up parallel readline; builds types for communicators, cartesian
+communicators, and request objects ; fixes to the pipe command (which
+otherwise may hang on a SIG_CHLD); loads the pickle module for
+serialization; fixed distutils so it builds MPI enabled .so files;
+adds basic reductions for general Python types; builds a configuration
+module with information from the configure step; and sets up a function to 
+clean up on exit.  There is also a hook to allow extenders to
+have control during this setup phase.
+
+All this takes place before the Python interpreter runs any user scripts
+regardless of whether mpi is explicitly imported.
+</section>
+
+
+</report>

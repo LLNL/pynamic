@@ -1,0 +1,72 @@
+INSTALL
+
+The basic build and install is invoked with
+
+% ./configure
+% make
+% make install
+
+This will build a default version of pyMPI based on the
+python program the configure script finds in your path.
+It also tries to find mpcc, mpxlc, or mpicc to do the
+compiling and linking with the MPI libraries.
+
+CUSTOMIZATION
+
+It is hard to predict exactly how to invoke MPI portably
+across multiple implementations (e.g. native, POE, LAM,
+MPICH, ...), so you may find it necessary to customize
+the configuration.  Here are some of the control available:
+
+-----------------------------------------------
+
+% ./configure --enable-experimental         
+
+Builds an alpha version of the refactored pyMPI -- not for
+general consumption
+
+-----------------------------------------------
+
+% env CC='mympicc' ./configure 
+
+Specify the C compiler to use (one that hopefully knows
+the MPI include and link directories)
+
+-----------------------------------------------
+
+% ./configure --with-debug
+% ./configure --with-debug="+K0 -g"
+
+Add a -g (default) or what ever the user specifies
+to the compile and link lines.
+
+-----------------------------------------------
+
+% ./configure --with-python=/usr/somewhere/bin/python
+
+Use to specify a specific python, not the one found
+first in the path.  Some Redhat installs persist in
+having "python" point to python1.5 even though there
+is a beautiful python2.2 executable built right in.
+
+-----------------------------------------------
+
+% ./configure --prefix=$HOME/local
+
+If --prefix isn't specified, the configure script will
+default to the same directory as the python that is
+selected (Note: this is different than the standard
+configure that usually selects /usr/local unless
+explicitly overridden).
+
+-----------------------------------------------
+
+% ./configure --with-includes=-I/usr/mpi/include
+
+If the C compiler can't find your MPI files, then
+you may need to give it some help (e.g. you are
+using gcc and need to point at the MPICH implementation).
+You can specify multiple directories with
+--with-includes='-I/usr/one -I/usr/two'
+
+-----------------------------------------------

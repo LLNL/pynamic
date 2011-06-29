@@ -1,0 +1,218 @@
+---- processing /usr/local/tools/icc-11.1.046/lib/intel64/libimf.so, measurement unit in Byte ---
+Image Name: /usr/local/tools/icc-11.1.046/lib/intel64/libimf.so
+Image size: 2662610
+Text size: 2411906
+Data size: 15960
+Size of debug section: 0
+Size of symbol table: 184104
+Size of string table: 45442
+---- processing /lib64/libm-2.5.so, measurement unit in Byte ---
+Image Name: /lib64/libm-2.5.so
+Image size: 611880
+Text size: 528330
+Data size: 720
+Size of debug section: 0
+Size of symbol table: 43200
+Size of string table: 15664
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility0.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility0.so
+Image size: 12562
+Text size: 2948
+Data size: 536
+Size of debug section: 3840
+Size of symbol table: 1584
+Size of string table: 482
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility1.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility1.so
+Image size: 11801
+Text size: 2693
+Data size: 528
+Size of debug section: 3393
+Size of symbol table: 1560
+Size of string table: 465
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility2.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility2.so
+Image size: 8397
+Text size: 1421
+Data size: 496
+Size of debug section: 1554
+Size of symbol table: 1440
+Size of string table: 397
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility3.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility3.so
+Image size: 11809
+Text size: 2701
+Data size: 528
+Size of debug section: 3390
+Size of symbol table: 1560
+Size of string table: 465
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility4.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libutility4.so
+Image size: 12346
+Text size: 2880
+Data size: 536
+Size of debug section: 3694
+Size of symbol table: 1584
+Size of string table: 482
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule0.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule0.so
+Image size: 20230
+Text size: 3631
+Data size: 744
+Size of debug section: 10042
+Size of symbol table: 1824
+Size of string table: 630
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule1.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule1.so
+Image size: 19198
+Text size: 3029
+Data size: 736
+Size of debug section: 9167
+Size of symbol table: 1752
+Size of string table: 582
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule2.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule2.so
+Image size: 22330
+Text size: 4523
+Data size: 800
+Size of debug section: 11099
+Size of symbol table: 1944
+Size of string table: 714
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule3.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule3.so
+Image size: 21527
+Text size: 4296
+Data size: 768
+Size of debug section: 10715
+Size of symbol table: 1848
+Size of string table: 647
+---- processing /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule4.so, measurement unit in Byte ---
+Image Name: /g/g0/lee218/src/pynamic-1.1/pynamic-pyMPI-2.6a1/libmodule4.so
+Image size: 22817
+Text size: 4858
+Data size: 792
+Size of debug section: 11316
+Size of symbol table: 1920
+Size of string table: 697
+---- processing /lib64/libpthread-2.5.so, measurement unit in Byte ---
+Image Name: /lib64/libpthread-2.5.so
+Image size: 142696
+Text size: 88080
+Data size: 1672
+Size of debug section: 0
+Size of symbol table: 22704
+Size of string table: 19147
+---- processing /lib64/libdl-2.5.so, measurement unit in Byte ---
+Image Name: /lib64/libdl-2.5.so
+Image size: 20424
+Text size: 7482
+Data size: 800
+Size of debug section: 0
+Size of symbol table: 3264
+Size of string table: 1585
+---- processing /lib64/libutil-2.5.so, measurement unit in Byte ---
+Image Name: /lib64/libutil-2.5.so
+Image size: 15280
+Text size: 6145
+Data size: 800
+Size of debug section: 0
+Size of symbol table: 2592
+Size of string table: 1378
+---- processing /usr/local/tools/mvapich-intel-1.2/lib/shared/libmpich.so.1.0, measurement unit in Byte ---
+Image Name: /usr/local/tools/mvapich-intel-1.2/lib/shared/libmpich.so.1.0
+Image size: 3598750
+Text size: 792869
+Data size: 22836
+Size of debug section: 2577564
+Size of symbol table: 150456
+Size of string table: 52046
+---- processing /usr/local/tools/icc-11.1.046/lib/intel64/libsvml.so, measurement unit in Byte ---
+Image Name: /usr/local/tools/icc-11.1.046/lib/intel64/libsvml.so
+Image size: 1406812
+Text size: 1136567
+Data size: 2108
+Size of debug section: 0
+Size of symbol table: 155160
+Size of string table: 107556
+---- processing /usr/local/tools/icc-11.1.046/lib/intel64/libintlc.so.5, measurement unit in Byte ---
+Image Name: /usr/local/tools/icc-11.1.046/lib/intel64/libintlc.so.5
+Image size: 269217
+Text size: 234705
+Data size: 7736
+Size of debug section: 0
+Size of symbol table: 15696
+Size of string table: 8617
+---- processing /lib64/libgcc_s-4.1.2-20080825.so.1, measurement unit in Byte ---
+Image Name: /lib64/libgcc_s-4.1.2-20080825.so.1
+Image size: 56072
+Text size: 51636
+Data size: 824
+Size of debug section: 0
+Size of symbol table: 0
+Size of string table: 0
+---- processing /lib64/libc-2.5.so, measurement unit in Byte ---
+Image Name: /lib64/libc-2.5.so
+Image size: 1712536
+Text size: 1364725
+Data size: 17912
+Size of debug section: 0
+Size of symbol table: 173808
+Size of string table: 93718
+---- processing /usr/lib64/libpsm_infinipath.so.1.13, measurement unit in Byte ---
+Image Name: /usr/lib64/libpsm_infinipath.so.1.13
+Image size: 297256
+Text size: 288235
+Data size: 5528
+Size of debug section: 0
+Size of symbol table: 0
+Size of string table: 0
+---- processing /usr/lib64/libpmi.so.0.0.0, measurement unit in Byte ---
+Image Name: /usr/lib64/libpmi.so.0.0.0
+Image size: 55734
+Text size: 17148
+Data size: 848
+Size of debug section: 29720
+Size of symbol table: 3144
+Size of string table: 1630
+---- processing /lib64/librt-2.5.so, measurement unit in Byte ---
+Image Name: /lib64/librt-2.5.so
+Image size: 50288
+Text size: 27893
+Data size: 1244
+Size of debug section: 0
+Size of symbol table: 7272
+Size of string table: 4988
+---- processing /usr/local/tools/icc-9.1.052/lib/libirc.so, measurement unit in Byte ---
+Image Name: /usr/local/tools/icc-9.1.052/lib/libirc.so
+Image size: 316415
+Text size: 248841
+Data size: 4744
+Size of debug section: 0
+Size of symbol table: 46848
+Size of string table: 13847
+---- processing /usr/lib64/libinfinipath.so.4.0, measurement unit in Byte ---
+Image Name: /usr/lib64/libinfinipath.so.4.0
+Image size: 48304
+Text size: 43992
+Data size: 1332
+Size of debug section: 0
+Size of symbol table: 0
+Size of string table: 0
+---- processing /usr/lib64/libslurm.so.21.0.0, measurement unit in Byte ---
+Image Name: /usr/lib64/libslurm.so.21.0.0
+Image size: 2747630
+Text size: 800201
+Data size: 15936
+Size of debug section: 1811929
+Size of symbol table: 60744
+Size of string table: 51222
+
+
+************************************************
+Size of aggregate total of shared libraries: 14.2MB
+Size of aggregate texts of shared libraries: 8.1MB
+Size of aggregate data of shared libraries: 107.5KB
+Size of aggregate debug sections of shared libraries: 4.5MB
+Size of aggregate symbol tables of shared libraries: 886.0KB
+Size of aggregate string table size of shared libraries: 422.4KB
+************************************************

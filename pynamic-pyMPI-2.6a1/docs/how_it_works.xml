@@ -1,0 +1,615 @@
+<?xml encoding='UTF-8'?>
+
+<report title="pyMPI: How it works" author="Pat Miller" institution="LLNL" dateline="April 2003"> 
+
+<section title="Startup">
+
+pyMPI assumes a simple MPI startup and then continues through the
+normal Py_Main() API call. The basic implementation provides a simple
+main.c that calls <bold>MPI_Init()</bold>,
+<bold>pyMPI_Initialize</bold>, <bold>Py_Main()</bold>, and
+<bold>MPI_Finalize</bold>.  MPI has to be initialized very early in
+this process as the standard ( <cite></cite>) indicates that
+conforming implementations do not have to duplicate open file
+descriptors and the like.  Indeed, MPICH isn't portably happy unless
+you call MPI_Init() before opening any files.  This precludes a pyMPI
+that runs serially until the import mpi statement magically starts a
+parallel run (even though this actually works with some combinations
+of MPI and OS, e.g. LAM-MPI and Linux).
+
+
+<p/>The MPI interface is installed as a builtin Python module (Added in
+pyMPI_Initialize via the PyImport_AppendInittab() call).  It
+initializes automatically from within Py_Main() during the first call
+to isatty() after Python initializes or via an explicit import of the
+mpi module. 
+
+<p/>The isatty() call has to be overridden anyway to get AIX/POE to
+work right in any case.  It is also invoked several times in
+Python startup when checking for an interactive TTY to
+print the startup message, when it initializes readline, etc...
+
+<p/>Once the mpi module is invoked, it loads a series of "plugins" that
+set up parallel readline; builds types for communicators, cartesian
+communicators, and request objects ; fixes to the pipe command (which
+otherwise may hang on a SIG_CHLD); loads the pickle module for
+serialization; fixed distutils so it builds MPI enabled .so files;
+adds basic reductions for general Python types; builds a configuration
+module with information from the configure step; and sets up a function to 
+clean up on exit.  There is also a hook to allow extenders to
+have control during this setup phase.
+
+<p/>All this takes place before the Python interpreter runs any user scripts
+regardless of whether mpi is explicitly imported.
+</section>
+
+<section title="Extending pyMPI">
+
+There are six routines that a code that wishes to extend pyMPI
+can change.  They hook into the initialize and "plugin" phase that
+pyMPI uses to initialize its internal components.  Extenders
+can provide:
+<c>
+void pyMPI_banner(char*,int);
+char* pyMPI_sitepackage_directory(void);
+void pyMPI_user_startup(void);
+void pyMPI_user_init(PyObject** docstring_pointer);
+void pyMPI_user_fini(void);
+void pyMPI_user_housekeeping(void);
+</c>
+
+<p/> The banner and directory routines are defined in separate object
+files.  The next four are all defined in pyMPI_user.c, so if one is
+provided then all four must be to avoid link errors.
+
+<p/> The banner function let's extenders change what pyMPI prints
+during an interactive startup session from "(pyMPI 2.0)" to any other
+string.  You are passed a buffer and maximum length.
+
+<p/> The sitepackage function lets extenders control where the python
+distutils package attempts to install site-packages.  It will also be
+placed in sys.path before the python site-packages so that parallel
+enabled packages are found in preference to serial ones.  It should
+return a constant, NULL terminated string.
+
+<p/> The four user routines fit into the "plugin" model that pyMPI
+uses for startup and teardown.  The first (startup) is called before
+Py_Initialize().  It is here so you can take advantage of the
+PyImport_AppendInittab call to add built in modules.  The second
+(init) is called when the mpi module loads (before any user scripts).
+The third (fini) is called on shutdown.  The fourth (housekeeping) may
+be called occasionally throughout the life of the program when the mpi
+module has control.  There is no guarantee that it will ever be
+called.
+
+
+Here's a simple customization:
+<c>
+#include "Python.h"
+
+extern void initfoobar(void);
+void pyMPI_banner(char* banner, int size) {
+  strncpy(banner,"(FOOBAR)",size);
+}
+void pyMPI_user_startup(void) {
+  PyImport_AppendInittab("foobar",initfoobar);
+}  
+void pyMPI_user_init(PyObject** docstring_pointer) {
+}
+void pyMPI_user_fini(void) {
+  puts("ALL DONE");
+}
+
+void pyMPI_user_housekeeping(void) {
+}
+
+char* pyMPI_sitepackage_directory(void) {
+  static char path[1024];
+  sprintf(path,"%s/ParallelThing/site-packages",getenv("HOME"));
+  return path;
+}
+</c>
+
+</section>
+
+<section title="Input at the prompt">
+
+pyMPI works interactively from the prompt just as serial Python does.
+All processors on the world communicator must participate since
+the act of reading and interpreting causes several synchronous
+operations to occur.  Note that Python treats code in blocks so
+<c style="fixed">
+>>> if rank == 0:
+...    print 'master'
+... else:
+...    print 'other'
+...
+</c>
+is read in as a single block, bytecode compiled, then executed.  This
+is different than sh, bash, or csh which interpret lines as they go.
+
+<p/> First a MPI barrier is thrown on the WORLD communicator to
+synchronize input (and to be sure all ranks are participating).  Then
+the master writes and flushes the prompt.
+
+<p/> The rank 0 process is the master and expects stdin to be attached
+to the tty.  It alone invokes the Python readline (either the cool Gnu
+one with command history or the lousy one which is basically a
+fgets()).  It then broadcasts the final string to each of the non-zero
+processes.
+
+<p/> This broadcast capability is only available for input at the
+prompt.  Reading from stdin in any other manner (e.g
+sys.stdin.readline() or fgets(line,stdin)).
+</section>
+
+
+
+
+<section title="The implied world communicator">
+
+Most MPI calls are available without the explicit use of a
+communicator.  Often this is because programs are operating across all
+MPI processes collectively (a reasonable default).  So, standard calls
+in the Python MPI module look very much like the C API calls with the
+communicator, MPI type information, and size information missing and
+with buffers replaced with input/output arguments.  Source and
+destination ranks are often defaulted as are tags.
+<c>
+MPI_Barrier() --> mpi.barrier
+MPI_Send(message,n,MPI_INT,rank+1,0,MPI_COMM_WORLD)
+              --> mpi.send(rank+1,message)
+MPI_Recv(rank+1,message,MPI_INT,MPI_ANY_TAG,MPI_COMM_WORLD,&amp;status)
+              --> message,status = mpi.recv(rank+1)
+
+</c>
+
+<p/>While this is a useful abstraction, this isn't quite real.  If a
+user examines the type of, say, mpi.barrier, he will discover that it
+is really a built-in method rather than a built-in function.  It is
+indeed a method on a communicator object.  All of the MPI methods,
+attributes, and properties on the real Python communicator object are
+"lifted" up to the module's namespace.
+
+<p/> The default world communicator (mpi.WORLD) is the actual object
+doing all the work.  So, mpi.send() is really just the bound method
+mpi.WORLD.send().  In fact, in Python, the test (mpi.send is
+mpi.WORLD.send) will be true.
+
+<p/>
+WORLD is a Python interface to an internal MPI communicator handle.
+This handle is created by duplicating (MPI_Comm_dup) MPI_COMM_WORLD.
+A direct interface to MPI_COMM_WORLD is available as mpi.COMM_WORLD.
+</section>
+
+<section title="Ownership issues">
+In the Python API, Python objects are generically represented as
+PyObject*.  The object's lifetime is controlled by a reference count.
+The API's user (the pyMPI implementor) is supposed to "know" if the
+the pointer sitting in his code is an <ital>owned reference</ital> or a <ital>borrowed
+reference</ital>.  If an owned reference goes out of scope without its
+reference count being decremented, it causes a memory leak and a slow
+painful death.  If a
+borrowed reference is accidentally as if it were an owned reference,
+it will be prematurely destroyed leaving a dangling pointer which may
+(or may not) cause a bizzare, sudden, and horrible death.  Since the
+API doesn't give many clues as to what kind of ownership comes with a
+pointer (same type for both, of course) such as
+<bold>PyInt_FromLongThatYouAreNowResponsibleFor()</bold>.  Even the
+API documentation can be spotty.  This can make it hard to be
+appropriately careful.  This is especially difficult since pyMPI tends
+to be a part time hobby for it's primary developer and a recreation
+ground for summer interns
+
+<p/>Since we don't have explicit help from the primitive C type system
+(in contrast to how the CXX Python project provides owned and borrowed
+reference types.  boost.Python has similar support), we instead fall
+back on a scheme that at least helps code readability and makes the
+developer's assumptions overt.  This has helped reduce leaks and
+dangling pointers in the code.
+
+<p/>When setting a PyObject* via an assigment or return-by-reference
+function argument, the developer should add a comment indicating the
+ownership such an assignment implies.  For instance, if we create an
+object, we own it and are responsible either executing a matching DECREF
+somewhere along the line or passing this ownership to another entity.
+<c>
+  PYCHECK( ival/*owned*/ = PyInt_FromLong(i) );
+</c>
+If the value we get is only borrowed, then we must not decrement its
+reference count.  We mark these objects as borrowed.
+<c>
+  PYCHECK( first/*borrowed*/ = PyTuple_GET_ITEM(args,0) );
+  ...
+  PYCHECK( PyArg_ParseTuple(args,"O",/*borrowed*/&amp;object) );
+</c>
+
+<p/>Do not use a pointer to hold both borrowed and owned
+references. We try to maintain an invariance of ownership throughout a
+function.  In particular, owned reference pointers either point to a
+object ready for DECREF or are NULL.  This simplifies exception
+recovery (see below).  Of course, sometimes pointers are in flux
+(e.g. we get a borrowed reference and immediately convert it to owned
+for some other purpose).  We will see, however, that at well defined
+<ital>invariant</ital> points (exception checks and return
+statements), the ownership must always be well defined.
+
+</section>
+
+<section title="Exception control... Assert, PYCHECK, and MPICHECK">
+
+pyMPI attempts to rigorously check for errors.  Catastrophic
+assumption errors are detected by an <bold>Assert()</bold> macro. The
+assertions are there to trap logic errors and abort the program.  They
+look for unexpected situations such as a NULL pointer being passed in
+where a valid pointer was expected.  In a very few places in the code,
+asserts are placeholders for true error control.  These are being
+vigorously eliminated.  Here's an example.  This internal utility
+creates a Python tuple of integers from an array of C ints.  The size
+must be non-negative and the pointer must point at something.
+<c>
+PyObject* pyMPI_util_int_array_to_tuple(int n, int* array) {
+  PyObject* result = 0;
+  int i;
+  Assert(n>=0);
+  Assert(array);
+  ...
+}
+</c>
+
+<p/>
+Trapping Python errors is somewhat more straightforward.  Most
+routines set an internal exception state that can be detected by
+<bold>PyErr_Occurred()</bold>. A few do not set an error condition,
+but indicate errors by returning an error value (e.g. the NULL pointer
+returned by <bold>PyDict_GetItemString()</bold>). To take care of the
+former, pyMPI uses the PYCHECK macro (defined in pyMPI_Macros.h).  The
+PYCHECK executes the statements comprised by its single argument.
+After completing those statements, PYCHECK tests the global error
+condition and, if set, will GOTO the pythonError: label which is
+expected to have error handling code.  At its simplest, it looks
+something like: 
+<c>
+PyObject* foobar(int x) {
+  PyObject* result = 0;
+
+  PYCHECK( result/*owned*/ = PyInt_FromLong(x) );
+  return result;
+pythonError:
+  return 0;
+}
+</c>
+
+<p/>
+Most routines, however, do not go quietly into the night.  Since pyMPI
+is implemented in C (though it can be compiled with C++) it doesn't
+have implicit destructors.  Each pythonError: handler must restore
+data to a consistent state.  This means resolving reference counts and
+freeing temporary memory.  To assist in this endevour, we rigorously
+initialze pointers to 0 (PyObject* and malloc'd).  Similarly, when a
+pointer becomes invalid (from passing ownership to another pointer or
+after destruction), we again set it to 0.  This lets us write:
+<c>
+PyObject* goobar(..) {
+  PyObject* temp = 0;
+  PyObject* result = 0;
+  int* buffer = 0;
+
+  PYCHECK( temp/*owned*/ = PyInt_FromLong(x) );
+  ...
+  buffer = (int*)(malloc(n*sizeof(int)));
+  ...
+  return result;
+pythonError:
+  Py_XDECREF(temp);
+  Py_XDECREF(result);
+  if ( buffer ) free(buffer);
+  return 0;
+}
+</c>
+Note the use of Py_XDECREF to release our reference to PyObjects.
+This has proper behaviour when its argument is NULL.   Similarly, we
+test raw heap pointers to avoid freeing NULL (which is naughty in some
+implementations).  It takes some care to create situations where these
+actions work at all error points.  In some cases in the code, error
+checking is deferred (with a comment to that effect) until a
+consistent state can again be acheived.
+
+<p/>In some places where we want to set an explicit error condition,
+we use PYCHECK with PyErr_SetString to set the error and start error
+recover.
+<c>
+  if ( condition ) {
+     PYCHECK( PyErr_SetString(PyExc_RuntimeError,"bad stuff") )
+  }
+</c>
+
+<p/>
+There is an implied assumption that the Python error state is "right"
+when the jump to pythonError: is made.  We could (and should) add an
+<bold>Assert(PyErr_Occurred())</bold> most of these handlers.  It just
+isn't there yet.
+
+<p/>The MPICHECK and MPICHECK_COMMLESS macros work for calls into the
+MPI API much the same as the PYCHECK macro does for calls into the
+Python API.  Unlike PYCHECK, however, which tests a global error
+condition, MPICHECK looks for the return status that most MPI calls
+set (so the argument must be a legal rhs in an assignment).  The
+communicators that pyMPI builds sets the error handler on all of its
+communicators (and MPI_COMM_WORLD) to MPI_ERRORS_RETURN. This suggests
+to MPI that we would prefer our MPI calls to return with an error flag
+set rather than preemptively aborting.  If that status is not
+MPI_SUCCESS, then an error sequence begins.  Note that MPI does not
+guarantee that MPI can recover from any error (or even that you can
+successfully flag them).
+
+<p/>When an error occurs, pyMPI gets an error string describing the
+error with MPI_Error_string.  This is converted to a Python exception
+via PyErr_SetString.  A quick goto to the pythonError: label and error
+handling continues as with PYCHECK.
+
+<p/>MPICHECK takes a communciator and an MPI API call as arguments.
+It temporarily sets the communicator's error handler to
+MPI_ERRORS_RETURN, runs the function, and resets the error status.
+The standard communicators which were already set to ERRORS_RETURN are
+left unchanged.  MPICHECKCOMMLESS skips the error handler change.
+
+</section>
+
+<section title="Short diatribe on goto">
+
+Hey!  Didn't Dijkstra say in "GOTO Considered Harmful" (CACM, Mar
+1968) that goto statements were, well.... harmful!  Well we need them
+here.  The actual goto statement is buried in a macro (except for
+two special cases: one a utility routine, the other a pair of nested
+loops.  Both could be written better).  In some sense, the
+pythonError: label is a "COMEFROM" rather than a "GOTO."  I like to
+think of the pythonError: as a somewhat abstract exception handler.
+</section>
+
+<section title="Data transport and the two message model">
+
+<p/>
+When pyMPI actually sends data, it has to convert it to a form it can
+"put on the wire."  With some exceptions (see reductions), the
+serialization is accomplished via the cPickle (fast version of pickle)
+module's loads() and dumps() methods.  This has the advantage of being
+built into Python with support for basic types and pure Python
+instances.  It also has a clear mechanism for extending it to new
+types.  When a message is to be sent off processor, it is serialized
+into a character string (using dumps()).  The message is passed using
+standard MPI calls (e.g. MPI_Send(serialized,n,MPI_CHAR,...)).  On the
+other side, a matching MPI call is made
+(MPI_Recv(serialized,n,MPI_CHAR,...))and then the PyObject* value is
+reconstituted using loads().  In effect, we perform a deep copy of an
+object as if we had pickled it off to a file and then read it in
+again.
+
+<p/>
+There a tricky bit that is missing here, however.  The pyMPI library routines
+do not have good foreknowledge of the actual size of a message.  The
+MPI standard (cite[]) indicates that implementations can legally bomb
+in interesting ways if a buffer is too small.  In any case, there
+isn't a standard, conforming way to receive a message if the specified
+buffer is too small (or indeed there is no guarantee of continuing
+once an error is detected).
+
+<p/>
+The utility routine pyMPI_pack handles this by sending messages in two
+parts.  The first message fits in a small, presized buffer of size
+PYMPI_INITMESGLEN.  This size is intended to be within the
+implementation's "eager limit" for small messages to facilitate
+non-blocking sends and to simplify actual buffering.
+The pyMPI_pack() routine uses the cPickle.dumps() routine to convert
+a PyObject* to a char*.  We send a message containing the string size
+and the first few dozen bytes of the message in a MPI packed buffer.
+If we're lucky, the whole message fits and no second message is
+needed.  If we're unlucky, we pack the remaining bytes in a second
+message.  Note that pyMPI_pack() doesn't send the message, it just
+pickles and packs the message into a small fixed size buffer and
+and an optional malloc'd buffer for overflow.  Customers of
+pyMPI_pack then send the message(s) through an appropriate
+MPI call... typically something like
+
+<c>
+MPI_Bcast(small);
+if ( big ) { MPI_Bcast(big); free(big); }
+</c>
+
+The associated code in the destination, after receiving the first
+message, unpacks the size and buffer start.  It then is responsible
+for allocating a buffer for the second message (if needed).
+Once the full buffer is assembled, pyMPI_unpack() calls
+the cPickle.loads() function to reconstitute the Python
+object in the receiver.  This part of the code has not been
+fully refactored and most send/recv pairs in the code manually
+unpack.  Its on the TODO list.
+
+</section>
+
+
+<section title="Implementing reductions">
+
+Here, we are concerned with the two pyMPI reduction methods:
+<c>
+mpi.reduce(message,operator,root,ground,type)
+mpi.allreduce(message,operator,root,ground,type)
+</c>
+These are implemented (with other collectives) in
+pyMPI_comm_collective.c.  Both allreduce and reduce are implemented in
+the static reduction() function because of the strong similarities in
+implementation.
+
+<p/>MPI reductions provide an important way of combining data across
+processors.  They also provide special challenges in Python.  Whereas
+i C or FORTRAN, the argument data is required to be homogenous; in
+Python no such requirement exists and indeed flies in the face of user
+expectations of combining data via a well defined reduction like
+operator+().
+
+<p/>At the same time, a crucial reduction like
+<c>
+new_dt = mpi.allreduce(dt,mpi.MIN)
+</c>
+should be built directly on the native MPI_Allreduce() call when dt is
+a double precision float.  Unfortunately, pyMPI cannot tell if this
+call is matched to a call on another MPI process.  In Python,
+min(3,4.5) makes sense even if it is not directly expressable in C. To
+balance the need for speed and the need for generality, pyMPI provides
+two execution paths for user reductions.
+
+<p/> To take advantage of a native reduction, the user adds a keyword
+argument to assert that all arguments have the same type:
+<c>
+new_dt = mpi.allreduce(dt,mpi.MIN,type=float)
+</c>
+If float (really C's double type) has a native definition in MPI (it
+does), then pyMPI short circuits the message serialization process and
+calls
+<c>
+MPI_Allreduce(&amp;in, &amp;out, 1, MPI_DOUBLE, MPI_MIN, pyMPI_COMM_WORLD)
+</c>
+Really bad things happen if the user type assertion is invalid
+(i.e. some other process invokes mpi.allreduce without it).  pyMPI
+will merrily generate mismatched messages and the message system will
+hang.  The current implementation supports native calls for Python
+float and int (C double and long).  The implementation routines (in
+pyMPI_comm_collective.c) are
+<c>
+static PyObject* specialized_double_reduction(PyObject* message,
+                                              MPI_Op op,
+                                              int root,
+                                              MPI_Comm communicator,
+                                              int rank,
+                                              int broadcast);
+static PyObject* specialized_integer_reduction(PyObject* message,
+                                              MPI_Op op,
+                                              int root,
+                                              MPI_Comm communicator,
+                                              int rank,
+                                              int broadcast);
+</c>
+The pyMPI 2003 summer intern project is to generalize the native
+interface to reductions and sends, but this temporary version is
+correctly implements the final interface.
+
+<p/>In the generic reduction, pyMPI has no knowledge of an operation's
+commutivity, so the reduction is done serially on the root process
+(rank 0 of the communicator).  MPI provides a mechanism by which a
+function's commutivity can be specified (MPI_Op_create() and
+MPI_Op_free()), but pyMPI has no interface to those operations as yet.
+
+<p/>At the heart of a reduce operation is a call to
+pyMPI_collective().  This function is called synchronously across a
+communicator.  
+<c>
+PyObject* pyMPI_collective( PyMPI_Comm *self,
+                            int root,
+                            PyObject* localValue,
+                            int includeRank);
+</c>
+Each slave (rank != root) process sends its local value to the root
+using the split message model described above.  The root process
+collects and reconstitutes these Python objects.  The values are then
+packed into a new Python Tuple object. This simplifies reference
+counting and deallocation, a previous implementation used a malloc'd
+buffer that had to be swept with a call to Py_DECREF and then free().
+This wasn't done correctly and the end result was a nasty memory leak.
+
+<p/>After the master (root) collects the data, it uses the Python
+builtin reduce function to do a pairwise reduction of values in the
+tuple (if the comm_size is 1, the single value is returned).  The
+reduce() function takes as input a Python reduction function and a
+sequence of values.  The call to pyMPI_collective() returns the
+sequence.  pyMPI defines hand written implementations of each of
+the MPI predefined operations.  As an alternative, the user can
+provide a callable object to use.  The functions are not messaged, but
+rather are used locally (on the root process).
+
+<p/>The builtin reduce generates the final value.  For the call to
+mpi.reduce(), we return this value on the root and Py_None on the
+slaves.  For calls to mpi.allreduce(), we must broadcast this value
+back to the slaves.
+
+</section>
+
+<section title="Non-blocking send and recv">
+pyMPI implements a non-blocking send and receive:
+<c>
+mpi.isend(message,destination,tag)
+mpi.irecv(source,tag)
+</c>
+The tag and source arguments are optional.
+
+<p/>Nonblocking sends and receives are quite a bit more complicated both
+in MPI and especially so in pyMPI.  Rather than eagerly copying a
+message out of a buffer or returning a message received in a buffer,
+MPI returns a request object.  The buffer associated with an send is
+assumed to exist until the send finishes its work.  The recv buffer
+has to be preallocated.  Further complicating pyMPI's work is that
+isend may actually send two messages (each non-blocking), so the
+receiver has to wait for both messages before it can reconstitute
+the full Python object.  This has impliciations for the MPI test and
+wait methods as well.  As an even further complication, Python has
+to deal with the premature destruction of objects when messages are
+still outstanding on a request.  Most of this complexity is contained in
+the request object's implementation.
+
+<p/>Let's start with isend().  It builds a split message in the
+typical way.  It then builds a PyMPI_Request object.  The request's
+internal type is marked as a send using the iAmASendObject flag.
+mpi.isend then issues MPI_Isend() to send the first message and (if
+the message is large) a second MPI_Isend() with the remainder. The
+buffer containing the first message and a malloc'd pointer to the
+second buffer are contained in the request object since they must
+persist until the request is fulfilled.  Each Isend() generates a
+request that is packed into the PyMPI_Request object for later processing.
+mpi.isend() returns the request object.
+
+<p/>Irecv() is pretty simple as well.  It builds a request object
+(with the iAmASendObject flag set false) and issues MPI_Irecv() on the
+first part of the message (the buffer is part of the request).  The
+resulting MPI request is held in the PyMPI_Request object for later
+processing.  mpi.irecv() returns the request object.
+</section>
+
+
+<section title="The request object">
+
+A request object seems pretty simple.  It has a few attributes
+for getting the message, status (tag and sender), and request
+completion status.  Requesting the message or status blocks MPI until
+fulfilled.  Requesting the completion status (.test) never blocks.
+MPI and pyMPI both provde methods for testing requests either singly
+or in a group (wait, waitany, waitall, testany, testall).  Messages
+can also be cancelled, but the MPI standard is a bit open on whether
+this will work for cancelling sends.
+
+<p/>Every time we touch a request object, we carefully (so as not to
+block) try to advance its state.  For sends, we see if the isend
+request is complete so we can release the malloc'd buffer.  For
+receives, we see if the first message has arrived so we can malloc a
+buffer for the second.   Then we start looking for the second.  When
+both arrive, we build the reconsitute the message as a PyObject*.
+
+<p/>When we want to either wait or test a pyMPI request we have to
+wait on both possible MPI request objects.  This means that it is
+harder to use the built in MPI_Waitany, MPI_Waitall, and so on.  The
+pyMPI versions instead loop over collections of requests.  For the
+waitall, this results in a nasty polling loop since it must wait for
+all requests to finalize before releasing.
+
+<p/>On destruction, pyMPI will cancel requests associated with
+irecv(), free any allocated buffers, and DECREF any fully
+reconstituted PyObject* values.  For an irecv(), if the requests are
+still outstanding, pyMPI cannot reliably cancel the send.  Older
+versions of pyMPI would block on isend() request destruction waiting
+for message delivery.  Starting with pyMPI2.0, the requests are held
+in a housekeeping list.  The intention (not fully realized) is to hold
+the requests and periodically test them for fulfillment and then
+release them.
+</section>
+
+
+
+</report>

@@ -1,0 +1,39 @@
+Patrick Miller
+
+Principle author and maintainer.  Background in compiled
+and interpreted parallel languages.  Past work includes
+the Sisal compiler -- for a really cool, implicitly parallel
+language.
+
+-----------------------------------------------
+
+Martin Casado
+
+<Your Bio Here>
+Authored the split message model that replaced one in which
+two messages were always sent -- this really helped performance.
+
+-----------------------------------------------
+
+Eric Jones
+<Your Bio Here>
+Helped with porting issues, especially to LAM-MPI.
+
+-----------------------------------------------
+
+Yeechi Chen
+<Your Bio Here>
+
+-----------------------------------------------
+
+Chris Murray
+<Your Bio Here>
+First implementation of gather/scatter. Certainly
+simplifies many kinds of parallel execution.
+
+-----------------------------------------------
+
+Susan Hazlett
+<Your Bio Here>
+
+-----------------------------------------------

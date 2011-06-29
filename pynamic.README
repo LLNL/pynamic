@@ -1,0 +1,308 @@
+#
+# FILE: pynamic.README
+#
+# Updates: 
+#          Jun 17 2011 GLL: Updated to pyMPI-2.6a1
+#          Mar 12 2007 DHA: change the suggested parameter
+#                           set to simulate an important multi-
+#                           physics application. 
+#          Feb 16 2007 DHA: 
+#                      GLL: Update HOWTOs for a set of new
+#                           functionality Greg Lee has added. 
+#          Jan 30 2007 DHA: file created	
+#                           So far, Linux/x86 and 
+#			    and Linux/x86-64 support
+#			    Near-term TODO: AIX support
+#				
+#
+#
+
+		Table Of Contents
+		=================
+
+1. OVERVIEW
+
+2. METHOD OF SOLUTION
+
+3. HOW TO BUILD AND TEST
+   3.1 TO BUILD
+   3.2 TO TEST
+
+4. VERSION 1.0 SOURCE TREE
+
+5. CONTACTS
+
+--------------------------------------------------------
+1. OVERVIEW 
+  Pynamic is a benchmark designed to test a system's ability 
+  to handle the Dynamic Linking and Loading requirements 
+  of Python-based scientific applications. This benchmark 
+  is developed to add a workload to our testing environment, 
+  workload that represents a newly emerging class of DLL behaviors. 
+  Pynamic builds on pyMPI, an MPI extension to Python. 
+  Our augmentation includes a code generator that automatically 
+  generates Python C-extension dummy codes and a glue layer 
+  that facilitates linking and loading of the generated dynamic 
+  modules into the resulting pyMPI. Pynamic is configurable, enabling
+  modeling the static properties of a specific code as described
+  in section 2 and 3. It does not, however, model any significant 
+  computations of the target and hence it is not subjected to 
+  the same level of control as the target code. In fact, HPC computer 
+  vendors and tool developers will be encouraged to add it 
+  to their testing suite once the code release is completed. 
+  An ability to produce and run this benchmark is an effective 
+  test for validating the capability of a compiler and 
+  a linker/loader as well as an OS kernel and other runtime systems 
+  of HPC computer vendors. In addition, the benchmark is designed 
+  as a stress test case for code development tools. Though Python 
+  has recently gained popularity in the HPC community, its heavy 
+  DLL operations have hindered certain HPC code development 
+  tools, notably parallel debuggers, from performing optimally. 
+
+--------------------------------------------------------
+2. METHOD OF SOLUTION 
+  The heart of Pynamic is a Python script that generates C files 
+  and compiles them into shared object libraries.  Each library 
+  contains a Python callable entry function as well as a number 
+  of utility functions.  The user can also enable cross library 
+  function calls with a command line argument. The Pynamic configure 
+  script then links these libraries into the pyMPI executable 
+  and creates a driver script to exercise the functions in the 
+  generated libraries. The user can specify the number of libraries 
+  to create, as well as the average number of utility functions 
+  per library, thus tailoring the benchmark to match some application 
+  of interest. Pynamic introduces randomness in the number of functions 
+  per module and the function signatures, thus ensuring some
+  heterogeneity of the libraries and functions. 
+
+--------------------------------------------------------
+3. HOW TO BUILD AND TEST 
+  3.1 To BUILD
+    % cd pynamic-pyMPI-2.4b4 
+    % config_pynamic.py
+
+    It will print out options and arguments:
+
+    --------------------------------------------------------
+    USAGE:
+    	config_pynamic.py <num_files> <avg_num_functions> [options]
+    
+    	<num_files> = total number of shared objects to produce
+    	<avg_num_functions> = average number of functions per shared object
+    
+    OPTIONS:
+    
+    -d <call_depth>
+    	maximum call stack depth, default = 10
+    
+    -e
+    	enables external functions to call across modules
+    
+    -n <length>
+    	add <length> characters to the function names
+    
+    -p
+    	add a print statement to every generated function
+    
+    -s <random_seed>
+    	seed to the random number generator
+    
+    -t
+    	add a timing metrics to the Pynamic driver
+    
+    -u <num_utility_mods> <avg_num_functions>
+    	create <num_utility_mods> math library-like utility modules
+    	with an average of <avg_num_u_functions> functions
+    	NOTE: Number of python modules = <num_files> - <avg_num_u_functions>
+    --------------------------------------------------------
+
+    Options and arguments are provided so that a tester can model certain 
+    static properties of a Python-based scientific applications. 
+    For example, if the tester wants to model a code that has 
+    following properties (this was actually taken from an important
+    LLNL application),
+
+    + Number of shared libraries: 495
+      - Python callable C-extension libraries: ~280
+      - Utility libraries (python "uncallable"): ~(495-280)=215
+
+    + Aggregate total of shared libraries: 1.1GB
+      - Aggregate text size of shared libraries: 234MB
+      - Aggregate data size of shared libraries: 3.9MB
+      - Aggregate debug section size of shared libraries: 779MB
+      - Aggregate symbol table size of shared libraries: 11MB
+      - Aggregate string table size of shared libraries: 75MB
+
+    a tester may use:
+      % config_pynamic.py 495 1850 -e -u 215 1850 -n 100
+    Please examine other options to model a target code better. 
+
+    When a Pynamic build is complete, it prints out a summary 
+    message about its own static properties. 
+
+    ************************************************
+    Size of aggregate total of shared libraries: 1.4GB
+    Size of aggregate texts of shared libraries: 491.0MB
+    Size of aggregate data of shared libraries: 12.9MB
+    Size of aggregate debug sections of shared libraries: 710.0MB
+    Size of aggregate symbol tables of shared libraries: 35.7MB
+    Size of aggregate string table size of shared libraries: 172.0MB
+    ************************************************
+ 
+    When more details on static properties for individual 
+    shared libraries are desired, please look into the full report:
+    "sharedlib_section_info"
+
+  3.1 TO TEST
+    % python pynamic_driver.py
+    
+      or in a batchxterm:
+    
+    % srun pynamic-pyMPI pynamic_driver.py
+
+    # note: Pynamic creates two executables:
+    #    pyMPI - a vanilla pyMPI build
+    #    pynamic-pyMPI - pyMPI with the generated .so's linked in
+
+--------------------------------------------------------
+4. VERSION 1.0 SOURCE TREE
+   .
+   |-- pynamic-pyMPI-2.4b4
+   |   |-- AUTHORS
+   |   |-- COPYING
+   |   |-- ChangeLog
+   |   |-- INSTALL
+   |   |-- LICENSE.TXT
+   |   |-- Makefile.am
+   |   |-- Makefile.in
+   |   |-- NEWS
+   |   |-- README
+   |   |-- aclocal.m4
+   |   |-- addall.c
+   |   |-- advanced_extension
+   |   |   |-- advanced.c
+   |   |   |-- setup.py
+   |   |   `-- test.py
+   |   |-- benchmarks
+   |   |   |-- benchmark.py
+   |   |   `-- cbenchmark.c
+   |   |-- cloning_pyMPI
+   |   |   |-- Makefile
+   |   |   `-- conan.c
+   |   |-- config.guess
+   |   |-- config.sub
+   |   |-- config_pynamic.py
+   |   |-- configure
+   |   |-- configure.ac
+   |   |-- docs
+   |   |   |-- Makefile
+   |   |   |-- README
+   |   |   |-- developers_guidance.xml
+   |   |   |-- developers_overview.xml
+   |   |   |-- extenders_guide.xml
+   |   |   |-- how_it_works.xml
+   |   |   |-- overview.xml
+   |   |   |-- pyMPI.pdf
+   |   |   `-- xml2ps.py
+   |   |-- examples
+   |   |   `-- fractal.py
+   |   |-- get-symtab-sizes
+   |   |-- initmpi.h
+   |   |-- install-sh
+   |   |-- micro_tests
+   |   |   `-- pyMPI_default_test
+   |   |-- missing
+   |   |-- mkinstalldirs
+   |   |-- mpicomm.h
+   |   |-- parallel_test
+   |   |-- pyMPI.c
+   |   |-- pyMPI.h
+   |   |-- pyMPI_Config.h
+   |   |-- pyMPI_Config.h.in
+   |   |-- pyMPI_Externals.h
+   |   |-- pyMPI_Macros.h
+   |   |-- pyMPI_Types.h
+   |   |-- pyMPI_banner.c
+   |   |-- pyMPI_cart.c
+   |   |-- pyMPI_comm.c
+   |   |-- pyMPI_comm_asynchronous.c
+   |   |-- pyMPI_comm_collective.c
+   |   |-- pyMPI_comm_io.c
+   |   |-- pyMPI_comm_map.c
+   |   |-- pyMPI_comm_message.c
+   |   |-- pyMPI_comm_misc.c
+   |   |-- pyMPI_configuration.c
+   |   |-- pyMPI_distutils.c
+   |   |-- pyMPI_file.c
+   |   |-- pyMPI_init.c
+   |   |-- pyMPI_initialize.c
+   |   |-- pyMPI_isatty.c
+   |   |-- pyMPI_linker.c
+   |   |-- pyMPI_main.c
+   |   |-- pyMPI_pickle.c
+   |   |-- pyMPI_pipes.c
+   |   |-- pyMPI_rco.c
+   |   |-- pyMPI_readline.c
+   |   |-- pyMPI_recv.c
+   |   |-- pyMPI_reductions.c
+   |   |-- pyMPI_request.c
+   |   |-- pyMPI_send.c
+   |   |-- pyMPI_shared_file.c
+   |   |-- pyMPI_signals.c
+   |   |-- pyMPI_site.c
+   |   |-- pyMPI_softload.c
+   |   |-- pyMPI_status.c
+   |   |-- pyMPI_sysmods.c
+   |   |-- pyMPI_user_banner.c
+   |   |-- pyMPI_user_directory.c
+   |   |-- pyMPI_user_fini.c
+   |   |-- pyMPI_user_init.c
+   |   |-- pyMPI_user_startup.c
+   |   |-- pyMPI_util.c
+   |   |-- scaling
+   |   |   |-- allreduce.py
+   |   |   |-- pingpong.c
+   |   |   |-- pingpongtest.py
+   |   |   `-- setup.py
+   |   |-- simple_extension
+   |   |   |-- setup.py
+   |   |   |-- simple.c
+   |   |   `-- test.py
+   |   |-- so_generator.py
+   |   |-- softload_setup.py
+   |   |-- softload_setup.py.in
+   |   |-- swig_example
+   |   |   |-- example.i
+   |   |   |-- examplecode.c
+   |   |   |-- setup.py
+   |   |   `-- test.py
+   |   |-- unittest
+   |   |   |-- PyMPITest.py
+   |   |   |-- extension.py
+   |   |   |-- gathers.py
+   |   |   |-- popen.py
+   |   |   |-- reduces.py
+   |   |   |-- run-all-tests.in
+   |   |   `-- scatters.py
+   |   `-- utils
+   |       |-- checkdistribution.py
+   |       |-- crontest
+   |       |-- editMakefile.py
+   |       |-- expose_configuration.py
+   |       |-- findExternals.py
+   |       `-- grind_docs_and_prototypes.py
+   |-- pynamic.LICENSE
+   `-- pynamic.README
+    
+   12 directories, 114 files
+ 
+--------------------------------------------------------
+5. CONTACTS 
+   Greg Lee <lee218@llnl.gov>	
+   Dong Ahn <ahn1@llnl.gov>
+   Bronis de Supinski <desupinski1@llnl.gov>
+   John Gyllenhaal <gyllenhaal1@llnl.gov>
+
+
+
+

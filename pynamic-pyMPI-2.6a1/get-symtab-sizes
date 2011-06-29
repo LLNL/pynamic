@@ -1,0 +1,59 @@
+#!/bin/ksh
+
+#
+# Please see COPYRIGHT information at the end of this file.
+# File: get-symtab-sizes
+# Author: Dong H. Ahn
+#
+# loops over all shared libraries of a give code  
+# and produce size information.   
+#
+
+sharedlib=`ldd $1 | gawk '{ print $3}' | xargs ap`
+
+rm -f 00imagesize 00debugsectsize 00symtabsize 00strtabsize 00textsize 00datasize
+
+for sh in $sharedlib; do 
+	echo "---- processing $sh, measurement unit in Byte ---"
+	echo "Image Name: $sh" 
+	ls -l $sh | gawk '{ print "Image size: "$5}' | tee -a 00imagesize 
+	size -f $sh | gawk '{if ($1 ~ /[0-9]+/) print "Text size: "$1}' | tee -a 00textsize
+        size -f $sh | gawk '{if ($2 ~ /[0-9]+/) print "Data size: "$2}' | tee -a 00datasize
+	readelf -S -W $sh | gawk '{if ($2 ~ /\.debug/ ) print $6}' | addall "debug section" 16 | tee -a 00debugsectsize
+	readelf -S -W $sh | gawk '{if ($2 ~ /\.symtab/ ) print $6}' | addall "symbol table" 16 | tee -a 00symtabsize
+	readelf -S -W $sh | gawk '{if ($2 ~ /\.strtab/ ) print $6}' | addall "string table" 16 | tee -a 00strtabsize
+done
+
+print ""
+print ""
+print "************************************************"
+
+cat 00imagesize | gawk '{ print $3 }' | addall "aggregate total of shared libraries" 10 -h
+cat 00textsize | gawk '{ print $3 }' | addall "aggregate texts of shared libraries" 10 -h
+cat 00datasize | gawk '{ print $3 }' | addall "aggregate data of shared libraries" 10 -h
+cat 00debugsectsize | gawk '{ print $5 }' | addall "aggregate debug sections of shared libraries" 10 -h
+cat 00symtabsize | gawk '{ print $5 }' | addall "aggregate symbol tables of shared libraries" 10 -h
+cat 00strtabsize | gawk '{ print $5 }' | addall "aggregate string table size of shared libraries" 10 -h
+
+print "************************************************"
+
+rm -f 00imagesize 00debugsectsize 00symtabsize 00strtabsize 00textsize 00datasize
+
+#
+#COPYRIGHT
+#
+#Copyright (c) 2007, The Regents of the University of California. 
+#Produced at the Lawrence Livermore National Laboratory 
+#Written by Gregory Lee, Dong Ahn, John Gyllenhaal, Bronis de Supinski. 
+#UCRL-CODE-228991. 
+#All rights reserved. 
+# 
+#This file is part of Pynamic.   For details contact Greg Lee (lee218@llnl.gov).  Please also read the "ADDITIONAL BSD NOTICE" in pynamic.LICENSE. 
+# 
+#Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: 
+# 
+#* Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer below.  
+#* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer (as noted below) in the documentation and/or other materials provided with the distribution.  
+#* Neither the name of the UC/LLNL nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OF THE UNIVERSITY OF CALIFORNIA, THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 

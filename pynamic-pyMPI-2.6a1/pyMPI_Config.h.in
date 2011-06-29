@@ -1,0 +1,170 @@
+/* pyMPI_Config.h.in.  Generated from configure.ac by autoheader.  */
+
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
+
+/* Define to 1 if you have the `efence' library (-lefence). */
+#undef HAVE_LIBEFENCE
+
+/* Define to 1 if you have the `m' library (-lm). */
+#undef HAVE_LIBM
+
+/* Define to 1 if you have the <memory.h> header file. */
+#undef HAVE_MEMORY_H
+
+/* Define to 1 if you have the `mpc_flush' function. */
+#undef HAVE_MPC_FLUSH
+
+/* Define to 1 if you have the `mpc_isatty' function. */
+#undef HAVE_MPC_ISATTY
+
+/* Are MPI_Comm_get_name and MPI_Comm_set_name defined by the MPI
+   implementation? */
+#undef HAVE_MPI_COMM_NAME_OPERATIONS
+
+/* Is MPI_File_close defined by the MPI implementation? */
+#undef HAVE_MPI_FILE_OPERATIONS
+
+/* Is MPI_Finalized defined by the MPI implementation? */
+#undef HAVE_MPI_FINALIZED
+
+/* Is MPI_Initialized defined by the MPI implementation? */
+#undef HAVE_MPI_INITIALIZED
+
+/* Define to 1 if you have the <pm_util.h> header file. */
+#undef HAVE_PM_UTIL_H
+
+/* Define to 1 if you have the `PyOS_StdioReadline' function. */
+#undef HAVE_PYOS_STDIOREADLINE
+
+/* Define to 1 if you have the `Py_ReadOnlyBytecodeFlag' function. */
+#undef HAVE_PY_READONLYBYTECODEFLAG
+
+/* Does Python use int or Py_ssize_t */
+#undef HAVE_PY_SSIZE_T
+
+/* Define to 1 if you have the `setlinebuf' function. */
+#undef HAVE_SETLINEBUF
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
+
+/* Define to 1 if you have the <stdlib.h> header file. */
+#undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the <strings.h> header file. */
+#undef HAVE_STRINGS_H
+
+/* Define to 1 if you have the <string.h> header file. */
+#undef HAVE_STRING_H
+
+/* Define to 1 if you have the <sys/param.h> header file. */
+#undef HAVE_SYS_PARAM_H
+
+/* Define to 1 if you have the <sys/stat.h> header file. */
+#undef HAVE_SYS_STAT_H
+
+/* Define to 1 if you have the <sys/types.h> header file. */
+#undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <unistd.h> header file. */
+#undef HAVE_UNISTD_H
+
+/* Name of package */
+#undef PACKAGE
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
+
+/* Do not allow MPI_Cancel() on isend requests */
+#undef PYMPI_BADCANCEL
+
+/* Name of MPI enabled C compiler */
+#undef PYMPI_COMPILER
+
+/* Modified compiler flags */
+#undef PYMPI_COMPILER_FLAGS
+
+/* Replacement function for get_makefile_filename */
+#undef PYMPI_GET_MAKEFILE_FILENAME_DEF
+
+/* Does this Python include Numeric? */
+#undef PYMPI_HAS_NUMERIC
+
+/* Does this Python include Numpy? */
+#undef PYMPI_HAS_NUMPY
+
+/* Can we get local NPROCESSORS? */
+#undef PYMPI_HAVE_SYSCONF_NPROCESSORS
+
+/* Installation prefix */
+#undef PYMPI_INCLUDEDIR
+
+/* Use simplified isatty() */
+#undef PYMPI_ISATTY
+
+/* Library location */
+#undef PYMPI_LIBDIR
+
+/* Name of the MPI enabled C compiler for linking */
+#undef PYMPI_LINKER
+
+/* Extra link flags needed to build */
+#undef PYMPI_LINKER_FLAGS
+
+/* Are we running in an OSX environment? */
+#undef PYMPI_MACOSX
+
+/* Major release */
+#undef PYMPI_MAJOR
+
+/* Are we running in MS Windows environment? */
+#undef PYMPI_MICROSOFT_WINDOWS
+
+/* Minor release */
+#undef PYMPI_MINOR
+
+/* Installation prefix */
+#undef PYMPI_PREFIX
+
+/* Issue a newline after prompt */
+#undef PYMPI_PROMPT_NL
+
+/* Directory where python library files live */
+#undef PYMPI_PYTHON_CONFIGDIR
+
+/* the "-l" name of python library */
+#undef PYMPI_PYTHON_LIBRARY
+
+/* Sub versioning a=alpha, b=beta, .x=release */
+#undef PYMPI_RELEASE
+
+/* Installation directory */
+#undef PYMPI_SITEDIR
+
+/* PACKAGE Short version */
+#undef PYMPI_VERSION_NAME
+
+/* Short version */
+#undef PYMPI_VERSION_SHORT
+
+/* Define to 1 if you have the ANSI C header files. */
+#undef STDC_HEADERS
+
+/* Version number of package */
+#undef VERSION
+
+/* Define to empty if `const' does not conform to ANSI C. */
+#undef const

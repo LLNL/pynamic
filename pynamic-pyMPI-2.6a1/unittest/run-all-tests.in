@@ -1,0 +1,100 @@
+#!/bin/sh
+#-*-sh-*-
+#
+# Run through some very simple tests to see if pyMPI is running right
+
+# Info from autoconf that we use to run MPI based programs.  Also,
+# we hopefully have a reasonable idea of the number of local processors
+# on which to run the check
+MPIRUNEXE=@MPIRUNEXE@
+MPIRUN=@MPIRUN@
+POE=@POE@
+PYMPI=./@PACKAGE@@EXEEXT@
+LOCAL_PROCESSORS=@LOCAL_PROCESSORS@
+
+# Automake sets the srcdir as an environment variable, but we may be
+# debugging if it is not set
+if test "$srcdir" = ""; then srcdir=.; fi
+
+
+# -----------------------------------------------
+# Make sure pyMPI is available
+# -----------------------------------------------
+if test ! -e "$PYMPI"; then
+  echo "Could not find pyMPI from build"
+  exit 1
+fi
+
+# -----------------------------------------------
+# Figure out how to run on this machine
+# -----------------------------------------------
+if test -n "$MPIRUNEXE"; then
+  RUNNER="$MPIRUNEXE -localonly -np # "`cygpath -w $PYMPI`
+else
+  if test -n "$MPIRUN"; then
+    RUNNER="$MPIRUN -np # $PYMPI"
+  else
+    if test -n "$POE"; then
+      RUNNER="$POE $PYMPI -procs # -a"
+    else
+      RUNNER="$PYMPI"
+    fi
+  fi
+fi
+
+# -----------------------------------------------
+# These are the unittests I wish to run for each
+# processor count.  Note that I could possibly
+# build up the TESTn variables so that I could have
+# a quick suite and a full suite
+# -----------------------------------------------
+TEST1="$srcdir/unittest/popen.py \
+    $srcdir/unittest/PyMPITest.py \
+    $srcdir/unittest/extension.py"
+TEST2="$srcdir/unittest/PyMPITest.py"
+TEST4="$srcdir/unittest/reduces.py \
+    $srcdir/unittest/gathers.py \
+    $srcdir/unittest/scatters.py \
+    $srcdir/unittest/popen.py \
+    $srcdir/unittest/PyMPITest.py"
+
+# -----------------------------------------------
+# Loop over the number of available processors
+# and run the tests appropriate to that number
+# -----------------------------------------------
+N=1
+PASS=0
+FAIL=0
+status=0
+while test "$N" -le "$LOCAL_PROCESSORS" -a "$N" -le 16; do
+  tests=`eval 'echo \$TEST'"$N"`
+  if test -n "$tests"; then
+    echo '********************' $N PROCESSORS '********************'
+    for test in $tests; do
+       cmd=`echo $RUNNER $test | sed s/#/$N/g`
+       echo "% $cmd"
+       if $cmd; then
+          echo $test PASSES 
+	  PASS=`expr $PASS + 1`
+       else
+          echo $test FAILS
+          status=1
+	  FAIL=`expr $FAIL + 1`
+       fi
+    done
+    echo '******************************************************'
+  fi
+  N=`expr $N + 1`
+done
+
+echo ""
+echo ""
+echo '******************************************************'
+echo '*                     SUMMARY                        *'
+echo '******************************************************'
+echo ""
+echo "Passed $PASS"
+echo "Failed $FAIL"
+echo ""
+echo ""
+exit $status

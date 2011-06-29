@@ -1,0 +1,68 @@
+#-*-python-*-**************************************************************#
+#* FILE   **************        setup.py.in        ************************#
+#**************************************************************************#
+#* Author: Patrick Miller February 25 2004                                *#
+#* Copyright (C) Patrick J. Miller                                        *#
+#**************************************************************************#
+
+import os
+import distutils.unixccompiler
+from distutils.core import setup, Extension
+
+# These come from the ./configure phase
+pyCC="@pyCC@"
+CC="@CC@"
+CFLAGS="@CFLAGS@"
+
+
+##################################################################
+#                    CLASS MPI_UNIXCCOMPILER                     #
+##################################################################
+class MPI_UnixCCompiler(distutils.unixccompiler.UnixCCompiler):
+    """MPI_UnixCCompiler
+
+    We override the UnixCCompiler class so that we can replace
+    the original Python CC with the MPI CC (and hope for the best)
+    """
+
+    def __fix(self, old):
+       if type(old) != str: return old
+       values = old.split(' ')
+       updated = []
+       for x in values:
+           if x == pyCC.split()[0]:
+             x=CC
+             if (len(pyCC.split()[0]) > 1):
+                 x += ' '.join(['']+pyCC.split()[1:])
+
+           updated.append(x)
+       return ' '.join(updated)
+   
+    __set_executable = distutils.unixccompiler.UnixCCompiler.set_executable
+    def set_executable(self,key,value):
+        "We replace every cc reference with the MPI cc"
+        if type(value) == type([]):
+            value = [self.__fix(x) for x in value]
+        else:
+            value = self.__fix(value)
+        return self.__set_executable(key,value)
+    
+distutils.unixccompiler.UnixCCompiler = MPI_UnixCCompiler
+
+os.system('make')
+
+setup(name='pyMPI',
+      version='@PYMPI_MAJOR@.@PYMPI_MINOR@',
+      description='MPI for Python',
+      author='Pat Miller',
+      author_email='patmiller@users.sourceforge.net',
+      url='http://sourceforge.net/projects/pympi/',
+      ext_modules=[
+      Extension('mpi',
+              ['pyMPI_softload.c'],
+              library_dirs=[os.getcwd()],
+              libraries=['pyMPI'],
+              ),
+    ],
+      )
+

@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+#-*-python-*-
+import sys,os,glob
+
+MPIRUN="@MPIRUN@"
+MVRUN="@MVRUN@"
+POE="@POE@"
+NOPOE="@NOPOE@"
+
+tests = glob.glob(os.path.join('micro_tests','*[0-9]'))
+tests.sort()
+
+try:
+    n = sys.argv.index('-n')
+    del sys.argv[n]
+    dry_run = True
+except ValueError:
+    dry_run = False
+
+try:
+    n = sys.argv.index('-max')
+    maxp = int(sys.argv[n+1])
+    del sys.argv[n+1]
+    del sys.argv[n]
+except:
+    maxp = 4
+
+if sys.argv[1:]:
+    runner = ' '.join(sys.argv[1:])
+else:
+    if MVRUN:
+        runner = 'mvrun --numnodes=%(np)s --ppn=1 -- `sq-hostlist` %(pyMPI)s %(test)s'
+    elif NOPOE:
+        runner = 'nopoe %(pyMPI)s %(test)s'
+        maxp = 1
+    elif MPIRUN:
+        runner = 'mpirun -np %(np)s %(pyMPI)s %(test)s'
+    else:
+        raise NotImplementedError,"Have to provide runner as an argument"
+
+print runner
+print maxp
+print dry_run
+
+failures = []
+for test in tests:
+    # Skip directories
+    if os.path.isdir(test): continue
+
+    # Skip the MPI abort tests
+    if open(test).read().find('mpi.abort') >= 0: continue
+
+    for np in range(1,maxp+1):
+        pyMPI = './pyMPI'
+        command = runner%locals()
+        print '--------------------------------------------------'
+        print '%',command
+        if not dry_run:
+            stat = os.system(command)
+            print '--------------------------------------------------'
+            if stat != 0:
+                if stat >> 8 == 77:
+                    print 'EXPECTED FAILURE'
+                else:
+                    print 'UNEXPECTED FAILURE'
+                    failures.append((command,stat))
+
+if failures:
+    for F,stat in failures:
+        print F,'==>',stat
+    sys.exit(1)
+    

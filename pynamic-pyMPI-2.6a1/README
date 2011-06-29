@@ -1,0 +1,82 @@
+
+
+This is pyMPI version 2.0a5
+===========================
+
+Copyright (C) 2000 University of California Regents
+
+License Information
+-------------------
+
+See ./LICENSE.TXT for history and terms of usage, and A DISCLAIMER
+OF ALL WARRANTIES.
+
+Installation
+------------
+
+Quick Start:
+
+  >./configure
+  >make
+  >make check
+  >make install
+
+If you want to lauch mpi directly from "normal" Python, then run
+% python setup.py build
+% python setup.py install
+(or % python setup.py install --install-lib=.)
+
+Note: if you are making directly from a CVS branch run the script 'boot'
+in this directory and then follow the steps above.
+
+  If you have problems or what a more in-depth discussion, see
+ docs/INSTALL.TXT (when it becomes available)
+
+What is pyMPI?
+--------------
+
+pyMPI is an implementation of MPI in python. pyMPI is intended to
+support fast development of actual or prototypical parallel 
+applications as well as provide a tool for teaching parallel
+programming methods without the intricacies of higher level languages.
+
+What is MPI?
+------------
+
+(Shamelessly stripped from http://www-unix.mcs.anl.gov/mpi/)
+
+MPI is a library specification for message-passing, proposed as a standard by a broadly based committee of
+vendors, implementors, and users.
+
+What is Python?
+---------------
+
+(Shamelessly stripped from the Python README)
+
+Python is an interpreted object-oriented programming language suitable
+(amongst other uses) for distributed application development, 
+scripting, numeric computing and system testing.  Python is often
+compared to Tcl, Perl, Java, JavaScript, Visual Basic or Scheme.  To
+find out more about what Python can do for you, point your browser to
+http://www.python.org.
+
+How do I learn Python?
+----------------------
+
+(Shamelessly stripped from the Python README)
+
+The official tutorial is still a good place to start; see
+http://www.python.org/doc/ for online and downloadable versions, as
+well as a list of other introductions, and reference documentation.
+
+There's a quickly growing set of books on Python.  See
+http://www.python.org/psa/bookstore/ for a list.
+
+Questions
+---------
+
+Visit us on sourceforge at: http://sourceforge.net/projects/pympi/
+for discussions, bug-reports, updates etc.
+
+
+-- EOF 
