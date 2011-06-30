@@ -15,14 +15,15 @@
 #include "pyMPI.h"
 #include "pyMPI_Macros.h"
 
+#ifdef PYMPI_HAS_NUMPY
+#undef PYMPI_HAS_NUMERIC
+#include "numpy/arrayobject.h"
+static int NUMPY_IS_LOADED = 0;
+#endif
+
 #ifdef PYMPI_HAS_NUMERIC
 #include "Numeric/arrayobject.h"
 static int NUMERIC_IS_LOADED = 0;
-#endif
-
-#ifdef PYMPI_HAS_NUMPY
-#include "numpy/arrayobject.h"
-static int NUMPY_IS_LOADED = 0;
 #endif
 
 

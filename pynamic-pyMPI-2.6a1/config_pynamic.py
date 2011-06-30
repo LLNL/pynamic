@@ -24,6 +24,7 @@
 #
 
 from so_generator import *
+from subprocess import *
 import sys, os
 import os.path
 
@@ -31,70 +32,63 @@ import os.path
 # run the so_generator
 #
 if len(sys.argv) < 3:
-	print_usage('config_pynamic.py')
-	sys.exit(1)
-configure_args = parse_and_run('config_pynamic.py')
+    print_usage('config_pynamic.py')
+    sys.exit(1)
+configure_args, python_command = parse_and_run('config_pynamic.py')
 
 #
-# configure pyMPI
+# configure pyMPI with the pynamic-generated libraries
 #
-#mycwd = os.getcwd()
 cwd = os.getcwd()
-command = 'configure --with-prompt-nl --with-isatty '
-command += '--with-libs=\' -Wl,-rpath=' + cwd + ' -L' + cwd + ' '
+command = './configure --with-prompt-nl --with-isatty '
+command += ' --with-python=%s ' %(python_command)
+command += '--with-libs=\'-Wl,-rpath=' + cwd + ' -L' + cwd + ' '
 for p, d, f in os.walk('./'):
-        for file in f:
-		if file.find('.so') != -1 and file.find('lib') != -1:
-	                link_name = '-l'
-	                dot_location = file.find('.')
-	                link_name += file[3:dot_location]
-	                command += link_name + ' '
+    for file in f:
+        if file.find('.so') != -1 and file.find('lib') != -1:
+            command += '-l' + file[3:file.find('.')] + ' '
 command += '\' '
 for arg in configure_args:
-	command += arg + ' '
-print command
+    command += arg + ' '
+print(command)
 ret = os.system(command)
 if ret != 0:
-	error_msg = 'configure returned an error! Please specify/fix configure args with the -c option'
-	print_error(error_msg)
+    print_error('configure returned an error! Please specify/fix configure args with the -c option')
 
 #
 # run the pyMPI Makefile
 #
 ret = os.system("make clean")
+if ret != 0:
+    print_error('make clean failed!')
 ret = os.system("make")
 if ret != 0:
-	error_msg = 'make failed!'
-	print_error(error_msg)
+    print_error('make failed!')
 
 #
-# make a utility program
+# build the addall utility program
 #
 if os.path.exists('./addall.c') != True:
-	error_msg = 'addall.c is required!'
-	print_error(error_msg)
+    print_error('required file addall.c not found!')
 
 command = "gcc -g addall.c -o addall"
-print command
+print(command)
 ret = os.system(command)
 if ret != 0:
-	error_msg = 'Failed to build addall utility!'
-	print_error(error_msg)
+    print_error('Failed to build addall utility!')
 
 #
 # check DBG, text, symbol table, and string table size.
 #
 if os.path.exists('./get-symtab-sizes') != True:
-	error_msg = 'get-symtab-sizes is required!'
-	print_error(error_msg)
+    print_error('required file get-symtab-sizes not found!')
 
 os.system('rm -f sharedlib_section_info')
 command = "get-symtab-sizes pynamic-pyMPI > sharedlib_section_info"
-print command
+print(command)
 ret = os.system(command)
 if ret != 0:
-	error_msg = 'Failed to get executable statistics!'
-	print_error(error_msg)
+    print_error('Failed to get executable statistics!')
 
 command = "tail -10 sharedlib_section_info"
 os.system(command)
