@@ -58,9 +58,11 @@ if ret != 0:
 #
 # run the pyMPI Makefile
 #
+print('make clean')
 ret = os.system("make clean")
 if ret != 0:
     print_error('make clean failed!')
+print('make')
 ret = os.system("make")
 if ret != 0:
     print_error('make failed!')
