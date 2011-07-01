@@ -510,6 +510,7 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	   $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
 	  else :; fi; \
 	done
+	rm -f lib*
 
 uninstall-binPROGRAMS:
 	@$(NORMAL_UNINSTALL)
@@ -886,6 +887,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-libLIBRARIES \
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
+	-rm -f lib*
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
 
