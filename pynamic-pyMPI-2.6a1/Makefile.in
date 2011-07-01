@@ -411,19 +411,19 @@ all: pyMPI_Config.h
 .SUFFIXES: .c .o .obj
 am--refresh:
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-	@for dep in $?; do \
-	  case '$(am__configure_deps)' in \
-	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu '; \
-	      cd $(srcdir) && $(AUTOMAKE) --gnu  \
-		&& exit 0; \
-	      exit 1;; \
-	  esac; \
-	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  Makefile'; \
-	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  Makefile
+#$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+#	@for dep in $?; do \
+#	  case '$(am__configure_deps)' in \
+#	    *$$dep*) \
+#	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu '; \
+#	      cd $(srcdir) && $(AUTOMAKE) --gnu  \
+#		&& exit 0; \
+#	      exit 1;; \
+#	  esac; \
+#	done; \
+#	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  Makefile'; \
+#	cd $(top_srcdir) && \
+#	  $(AUTOMAKE) --gnu  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -435,13 +435,13 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
 
-$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
-	$(SHELL) ./config.status --recheck
-
-$(top_srcdir)/configure:  $(am__configure_deps)
-	cd $(srcdir) && $(AUTOCONF)
-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+#$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+#	$(SHELL) ./config.status --recheck
+#
+#$(top_srcdir)/configure:  $(am__configure_deps)
+#	cd $(srcdir) && $(AUTOCONF)
+#$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
+#	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 pyMPI_Config.h: stamp-h1
 	@if test ! -f $@; then \
