@@ -228,7 +228,7 @@ def create_driver(num_files, timing):
     f.write('\tmpi_avail = False\n')
     f.write('if mpi_avail == False:\n')
     if timing == True:
-        f.write('\tprint \'Sequoia Benchmark Version 0.9.0\\n\'\n')
+        f.write('\tprint \'Sequoia Benchmark Version 1.1.0\\n\'\n')
         f.write('\tif len(sys.argv) > 1:\n')
         f.write('\t\tstart_time = float(sys.argv[1])\n')
         f.write('\t\tprint \'startup time = \' + str(end_time - start_time) + \' secs\'\n')
@@ -237,7 +237,7 @@ def create_driver(num_files, timing):
     f.write('else:\n')
     f.write('\tif mpi.rank == 0:\n')
     if timing == True:
-        f.write('\t\tprint \'Sequoia Benchmark Version 0.9.0\\n\'\n')
+        f.write('\t\tprint \'Sequoia Benchmark Version 1.1.0\\n\'\n')
         f.write('\t\tif len(sys.argv) > 1:\n')
         f.write('\t\t\tstart_time = float(sys.argv[1])\n')
         f.write('\t\t\tprint \'startup time = \' + str(end_time - start_time) + \' secs\'\n')
