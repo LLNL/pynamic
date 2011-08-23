@@ -10,7 +10,7 @@ import distutils.unixccompiler
 from distutils.core import setup, Extension
 
 # These come from the ./configure phase
-pyCC="gcc -pthread"
+pyCC="cc -pthread"
 CC="/usr/local/bin/mpiicc"
 CFLAGS="-g -O2 -fPIC"
 

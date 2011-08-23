@@ -157,7 +157,7 @@ CC = /usr/local/bin/mpiicc
 CCDEPMODE = depmode=none
 CFLAGS = -g -O2 -fPIC
 CPP = /usr/local/bin/mpiicc -E -w
-CPPFLAGS =  -I/usr/apps/python2.5/include/python2.5 -I/usr/apps/python2.5/include/python2.5 -I/usr/apps/python2.5/lib/python2.5/site-packages/numpy/core/include -I/usr/apps/python2.5/include/python2.5 -I/usr/apps/python2.5/lib/python2.5/site-packages/numpy/core/include
+CPPFLAGS =  -I/usr/apps/python/include/python2.6 -I/usr/apps/python/include/python2.6 -I/usr/apps/python/lib/python2.6/site-packages/numpy/core/include -I/usr/apps/python/include/python2.6 -I/usr/apps/python/lib/python2.6/site-packages/numpy/core/include
 CXX = /usr/local/bin/g++
 CXXDEPMODE = depmode=none
 CXXFLAGS = -g -O2
@@ -176,7 +176,7 @@ INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = ${SHELL} $(install_sh) -c -s
 LDFLAGS = 
 LIBOBJS = 
-LIBS = -lm -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lutility2 -lutility3 -lutility4 -lmodule0 -lmodule1 -lmodule2 -lmodule3 -lmodule4   -L/usr/apps/python2.5/lib/python2.5/config -lpython2.5 -Wl,-rpath=/usr/gapps/python/chaos_4_x86_64_ib/opt-2.5/lib -Xlinker -export-dynamic   -lpthread -ldl  -lutil  
+LIBS = -lm -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lmodule0 -lmodule1 -lmodule2   -L/usr/apps/python/lib/python2.6/config -lpython2.6 -Wl,-rpath,/usr/gapps/python/chaos_4_x86_64/opt-2.6/lib -Xlinker -export-dynamic   -lpthread -ldl  -lutil  
 LN_S = ln -s
 LOCAL_PROCESSORS = 12
 LTLIBOBJS = 
@@ -194,11 +194,11 @@ PACKAGE_TARNAME =
 PACKAGE_VERSION = 
 PATH_SEPARATOR = :
 POE = 
-PYINCLUDEDIR = /usr/apps/python2.5/include/python2.5
-PYLIBCONFIGDIR = /usr/apps/python2.5/lib/python2.5/config
-PYLIBCONFIG_C = /usr/apps/python2.5/lib/python2.5/config/config.c
-PYLIBDIR = /usr/apps/python2.5/lib/python2.5/site-packages
-PYLIBMAKEFILE = /usr/apps/python2.5/lib/python2.5/config/Makefile
+PYINCLUDEDIR = /usr/apps/python/include/python2.6
+PYLIBCONFIGDIR = /usr/apps/python/lib/python2.6/config
+PYLIBCONFIG_C = /usr/apps/python/lib/python2.6/config/config.c
+PYLIBDIR = /usr/apps/python/lib/python2.6/site-packages
+PYLIBMAKEFILE = /usr/apps/python/lib/python2.6/config/Makefile
 PYMPI_BADCANCEL = 0
 PYMPI_ISATTY = 1
 PYMPI_MAJOR = 2
@@ -207,8 +207,8 @@ PYMPI_PROMPT_NL = 1
 PYMPI_RELEASE = a1
 PYMPI_VERSION_NAME = pyMPI2.6
 PYMPI_VERSION_SHORT = 2.6
-PYNAMICLIBS = -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lutility2 -lutility3 -lutility4 -lmodule0 -lmodule1 -lmodule2 -lmodule3 -lmodule4 
-PYTHON = /usr/local/bin/python2.5
+PYNAMICLIBS = -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lmodule0 -lmodule1 -lmodule2 
+PYTHON = /usr/local/bin/python
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
@@ -250,22 +250,22 @@ localstatedir = ${prefix}/var
 mandir = ${prefix}/man
 mkdir_p = mkdir -p --
 oldincludedir = /usr/include
-prefix = /usr/apps/python2.5
+prefix = /usr/apps/python
 program_transform_name = s,x,x,
 pyBASEMODLIBS = 
-pyBLDSHARED = gcc -pthread -shared
-pyCC = gcc -pthread
+pyBLDSHARED = cc -pthread -shared
+pyCC = cc -pthread
 pyCCSHARED = -fPIC
-pyCFLAGS = -fno-strict-aliasing -DNDEBUG -g -O3 -Wall -Wstrict-prototypes
-pyINCLUDEPY = /usr/gapps/python/chaos_4_x86_64_ib/opt-2.5/include/python2.5
-pyLDFLAGS = -Wl,-rpath=/usr/gapps/python/chaos_4_x86_64_ib/opt-2.5/lib
+pyCFLAGS = -fno-strict-aliasing -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes
+pyINCLUDEPY = /usr/gapps/python/chaos_4_x86_64/opt-2.6/include/python2.6
+pyLDFLAGS = -Wl,-rpath,/usr/gapps/python/chaos_4_x86_64/opt-2.6/lib
 pyLDLAST = 
-pyLDSHARED = gcc -pthread -shared
+pyLDSHARED = cc -pthread -shared
 pyLIBS = -lpthread -ldl  -lutil
 pyLINKFORSHARED = -Xlinker -export-dynamic
 pyLOCALMODLIBS = 
-pyOPT = -DNDEBUG -g -O3 -Wall -Wstrict-prototypes
-pyVERSION = 2.5
+pyOPT = -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes
+pyVERSION = 2.6
 sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 sysconfdir = ${prefix}/etc
@@ -382,8 +382,8 @@ EXTRA_DIST = \
 
 header_files = pyMPI.h pyMPI_Macros.h pyMPI_Types.h  pyMPI_Externals.h
 include_HEADERS = initmpi.h $(header_files) pyMPI_Config.h
-DASHL = `echo -lm -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lutility2 -lutility3 -lutility4 -lmodule0 -lmodule1 -lmodule2 -lmodule3 -lmodule4   -L/usr/apps/python2.5/lib/python2.5/config -lpython2.5 -Wl,-rpath=/usr/gapps/python/chaos_4_x86_64_ib/opt-2.5/lib -Xlinker -export-dynamic   -lpthread -ldl  -lutil   | tr ' ' '\012' | egrep '^-(l|L)'`
-NOT_DASHL = `echo -lm -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lutility2 -lutility3 -lutility4 -lmodule0 -lmodule1 -lmodule2 -lmodule3 -lmodule4   -L/usr/apps/python2.5/lib/python2.5/config -lpython2.5 -Wl,-rpath=/usr/gapps/python/chaos_4_x86_64_ib/opt-2.5/lib -Xlinker -export-dynamic   -lpthread -ldl  -lutil   | tr ' ' '\012' | egrep -v '^-(l|L)'`
+DASHL = `echo -lm -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lmodule0 -lmodule1 -lmodule2   -L/usr/apps/python/lib/python2.6/config -lpython2.6 -Wl,-rpath,/usr/gapps/python/chaos_4_x86_64/opt-2.6/lib -Xlinker -export-dynamic   -lpthread -ldl  -lutil   | tr ' ' '\012' | egrep '^-(l|L)'`
+NOT_DASHL = `echo -lm -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lmodule0 -lmodule1 -lmodule2   -L/usr/apps/python/lib/python2.6/config -lpython2.6 -Wl,-rpath,/usr/gapps/python/chaos_4_x86_64/opt-2.6/lib -Xlinker -export-dynamic   -lpthread -ldl  -lutil   | tr ' ' '\012' | egrep -v '^-(l|L)'`
 CLEANFILES = augmentedMakefile pyMPI.exp \
 	pyMPI_configuration.c \
 	extensiontest.* \
@@ -411,19 +411,19 @@ all: pyMPI_Config.h
 .SUFFIXES: .c .o .obj
 am--refresh:
 	@:
-$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
-	@for dep in $?; do \
-	  case '$(am__configure_deps)' in \
-	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu '; \
-	      cd $(srcdir) && $(AUTOMAKE) --gnu  \
-		&& exit 0; \
-	      exit 1;; \
-	  esac; \
-	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  Makefile'; \
-	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  Makefile
+#$(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
+#	@for dep in $?; do \
+#	  case '$(am__configure_deps)' in \
+#	    *$$dep*) \
+#	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu '; \
+#	      cd $(srcdir) && $(AUTOMAKE) --gnu  \
+#		&& exit 0; \
+#	      exit 1;; \
+#	  esac; \
+#	done; \
+#	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  Makefile'; \
+#	cd $(top_srcdir) && \
+#	  $(AUTOMAKE) --gnu  Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -435,13 +435,13 @@ Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
 	esac;
 
-$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
-	$(SHELL) ./config.status --recheck
-
-$(top_srcdir)/configure:  $(am__configure_deps)
-	cd $(srcdir) && $(AUTOCONF)
-$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
-	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+#$(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
+#	$(SHELL) ./config.status --recheck
+#
+#$(top_srcdir)/configure:  $(am__configure_deps)
+#	cd $(srcdir) && $(AUTOCONF)
+#$(ACLOCAL_M4):  $(am__aclocal_m4_deps)
+#	cd $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
 
 pyMPI_Config.h: stamp-h1
 	@if test ! -f $@; then \
@@ -510,6 +510,7 @@ install-binPROGRAMS: $(bin_PROGRAMS)
 	   $(INSTALL_PROGRAM_ENV) $(binPROGRAMS_INSTALL) "$$p" "$(DESTDIR)$(bindir)/$$f" || exit 1; \
 	  else :; fi; \
 	done
+	rm -f lib*
 
 uninstall-binPROGRAMS:
 	@$(NORMAL_UNINSTALL)
@@ -886,6 +887,7 @@ clean-am: clean-binPROGRAMS clean-generic clean-libLIBRARIES \
 distclean: distclean-am
 	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
+	-rm -f lib*
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-hdr distclean-tags
 
@@ -957,9 +959,9 @@ install-data-local: softload_setup.py
 	$(mkinstalldirs) $(DESTDIR)$(sitedir)
 	-$(PYTHON) softload_setup.py install --install-lib=$(DESTDIR)$(sitedir)
 pyMPI_linker.$(OBJEXT): pyMPI_linker.c
-	gcc -pthread -c $(srcdir)/pyMPI_linker.c
+	cc -pthread -c $(srcdir)/pyMPI_linker.c
 pyMPI_linker$(EXEEXT): $(pyMPI_linker_OBJECTS)
-	gcc -pthread -o pyMPI_linker$(EXEEXT) $(pyMPI_linker_OBJECTS)
+	cc -pthread -o pyMPI_linker$(EXEEXT) $(pyMPI_linker_OBJECTS)
 
 $(pyMPI_OBJECTS): pyMPI_Externals.h
 
@@ -1015,15 +1017,15 @@ pyMPI_Externals.h: $(libpyMPI_a_SOURCES) pyMPI_Types.h utils/grind_docs_and_prot
 #-----------------------------------------------
 # Updated Makefile for distutils to look at
 #-----------------------------------------------
-augmentedMakefile: /usr/apps/python2.5/lib/python2.5/config/Makefile Makefile
+augmentedMakefile: /usr/apps/python/lib/python2.6/config/Makefile Makefile
 	rm -f augmentedMakefile
-	$(PYTHON) $(srcdir)/utils/editMakefile.py < /usr/apps/python2.5/lib/python2.5/config/Makefile CC /usr/local/bin/mpiicc | \
+	$(PYTHON) $(srcdir)/utils/editMakefile.py < /usr/apps/python/lib/python2.6/config/Makefile CC /usr/local/bin/mpiicc | \
 		$(PYTHON) $(srcdir)/utils/editMakefile.py CXX /usr/local/bin/g++ | \
-		$(PYTHON) $(srcdir)/utils/editMakefile.py OPT -DHAVE_MPI  -I/usr/apps/python2.5/include/python2.5 -I/usr/apps/python2.5/include/python2.5 -I/usr/apps/python2.5/lib/python2.5/site-packages/numpy/core/include -I/usr/apps/python2.5/include/python2.5 -I/usr/apps/python2.5/lib/python2.5/site-packages/numpy/core/include -g -O2 -fPIC -DNDEBUG -g -O3 -Wall -Wstrict-prototypes | \
+		$(PYTHON) $(srcdir)/utils/editMakefile.py OPT -DHAVE_MPI  -I/usr/apps/python/include/python2.6 -I/usr/apps/python/include/python2.6 -I/usr/apps/python/lib/python2.6/site-packages/numpy/core/include -I/usr/apps/python/include/python2.6 -I/usr/apps/python/lib/python2.6/site-packages/numpy/core/include -g -O2 -fPIC -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes | \
 		$(PYTHON) $(srcdir)/utils/editMakefile.py LIBS $(DASHL)  | \
 		$(PYTHON) $(srcdir)/utils/editMakefile.py LINKFORSHARED  -Xlinker -export-dynamic | \
-		$(PYTHON) $(srcdir)/utils/editMakefile.py LDSHARED       ${bindir}/pyMPI$(version)_linker$(EXEEXT) gcc -pthread -shared | \
-		$(PYTHON) $(srcdir)/utils/editMakefile.py BLDSHARED      ${bindir}/pyMPI$(version)_linker$(EXEEXT) gcc -pthread -shared \
+		$(PYTHON) $(srcdir)/utils/editMakefile.py LDSHARED       ${bindir}/pyMPI$(version)_linker$(EXEEXT) cc -pthread -shared | \
+		$(PYTHON) $(srcdir)/utils/editMakefile.py BLDSHARED      ${bindir}/pyMPI$(version)_linker$(EXEEXT) cc -pthread -shared \
 	>> augmentedMakefile
 
 #--------------------------------------------------

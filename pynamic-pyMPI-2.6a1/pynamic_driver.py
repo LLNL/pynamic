@@ -8,14 +8,14 @@ try:
 except:
 	mpi_avail = False
 if mpi_avail == False:
-	print 'Sequoia Benchmark Version 0.9.0\n'
+	print 'Sequoia Benchmark Version 1.1.0\n'
 	if len(sys.argv) > 1:
 		start_time = float(sys.argv[1])
 		print 'startup time = ' + str(end_time - start_time) + ' secs'
 	print 'pynamic driver beginning... now importing modules'
 else:
 	if mpi.rank == 0:
-		print 'Sequoia Benchmark Version 0.9.0\n'
+		print 'Sequoia Benchmark Version 1.1.0\n'
 		if len(sys.argv) > 1:
 			start_time = float(sys.argv[1])
 			print 'startup time = ' + str(end_time - start_time) + ' secs'
@@ -24,8 +24,6 @@ import_start = time.time()
 import libmodule0
 import libmodule1
 import libmodule2
-import libmodule3
-import libmodule4
 import_end = time.time()
 import_time = import_end - import_start
 if mpi_avail == False:
@@ -37,8 +35,6 @@ call_start = time.time()
 libmodule0.libmodule0_entry()
 libmodule1.libmodule1_entry()
 libmodule2.libmodule2_entry()
-libmodule3.libmodule3_entry()
-libmodule4.libmodule4_entry()
 call_end = time.time()
 call_time = call_end - call_start
 if mpi_avail == False:

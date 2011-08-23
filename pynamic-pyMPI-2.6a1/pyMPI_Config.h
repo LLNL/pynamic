@@ -96,10 +96,10 @@
 #define PYMPI_COMPILER "/usr/local/bin/mpiicc"
 
 /* Modified compiler flags */
-#define PYMPI_COMPILER_FLAGS "-g -O2 -fPIC -I/usr/apps/python2.5/include/pyMPI2.6 -I/usr/gapps/python/chaos_4_x86_64_ib/opt-2.5/include/python2.5"
+#define PYMPI_COMPILER_FLAGS "-g -O2 -fPIC -I/usr/apps/python/include/pyMPI2.6 -I/usr/gapps/python/chaos_4_x86_64/opt-2.6/include/python2.6"
 
 /* Replacement function for get_makefile_filename */
-#define PYMPI_GET_MAKEFILE_FILENAME_DEF "def __parallel_get_makefile_filename(): return '/usr/apps/python2.5/lib/pyMPI2.6/augmentedMakefile'\n"
+#define PYMPI_GET_MAKEFILE_FILENAME_DEF "def __parallel_get_makefile_filename(): return '/usr/apps/python/lib/pyMPI2.6/augmentedMakefile'\n"
 
 /* Does this Python include Numeric? */
 #define PYMPI_HAS_NUMERIC 
@@ -111,19 +111,19 @@
 #define PYMPI_HAVE_SYSCONF_NPROCESSORS 
 
 /* Installation prefix */
-#define PYMPI_INCLUDEDIR "/usr/apps/python2.5/include/pyMPI2.6"
+#define PYMPI_INCLUDEDIR "/usr/apps/python/include/pyMPI2.6"
 
 /* Use simplified isatty() */
 #define PYMPI_ISATTY 1
 
 /* Library location */
-#define PYMPI_LIBDIR "/usr/apps/python2.5/lib/pyMPI2.6"
+#define PYMPI_LIBDIR "/usr/apps/python/lib/pyMPI2.6"
 
 /* Name of the MPI enabled C compiler for linking */
 #define PYMPI_LINKER "/usr/local/bin/mpiicc"
 
 /* Extra link flags needed to build */
-#define PYMPI_LINKER_FLAGS " -L/usr/apps/python2.5/lib/pyMPI2.6 -lpyMPI -lm -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lutility2 -lutility3 -lutility4 -lmodule0 -lmodule1 -lmodule2 -lmodule3 -lmodule4   -L/usr/apps/python2.5/lib/python2.5/config -lpython2.5 -Wl,-rpath=/usr/gapps/python/chaos_4_x86_64_ib/opt-2.5/lib -Xlinker -export-dynamic   -lpthread -ldl  -lutil  "
+#define PYMPI_LINKER_FLAGS " -L/usr/apps/python/lib/pyMPI2.6 -lpyMPI -lm -Wl,-rpath=/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -L/g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1 -lutility0 -lutility1 -lmodule0 -lmodule1 -lmodule2   -L/usr/apps/python/lib/python2.6/config -lpython2.6 -Wl,-rpath,/usr/gapps/python/chaos_4_x86_64/opt-2.6/lib -Xlinker -export-dynamic   -lpthread -ldl  -lutil  "
 
 /* Are we running in an OSX environment? */
 /* #undef PYMPI_MACOSX */
@@ -138,22 +138,22 @@
 #define PYMPI_MINOR "6"
 
 /* Installation prefix */
-#define PYMPI_PREFIX "/usr/apps/python2.5"
+#define PYMPI_PREFIX "/usr/apps/python"
 
 /* Issue a newline after prompt */
 #define PYMPI_PROMPT_NL 1
 
 /* Directory where python library files live */
-#define PYMPI_PYTHON_CONFIGDIR "/usr/apps/python2.5/lib/python2.5/config"
+#define PYMPI_PYTHON_CONFIGDIR "/usr/apps/python/lib/python2.6/config"
 
 /* the "-l" name of python library */
-#define PYMPI_PYTHON_LIBRARY "python2.5"
+#define PYMPI_PYTHON_LIBRARY "python2.6"
 
 /* Sub versioning a=alpha, b=beta, .x=release */
 #define PYMPI_RELEASE "a1"
 
 /* Installation directory */
-#define PYMPI_SITEDIR "/usr/apps/python2.5/lib/pyMPI2.6/site-packages"
+#define PYMPI_SITEDIR "/usr/apps/python/lib/pyMPI2.6/site-packages"
 
 /* PACKAGE Short version */
 #define PYMPI_VERSION_NAME "pyMPI2.6"

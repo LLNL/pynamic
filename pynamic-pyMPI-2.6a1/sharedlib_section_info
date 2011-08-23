@@ -1,3 +1,4 @@
+0 /usr/local/tools/icc-11.1.046/lib/intel64/libimf.so /lib64/libm-2.5.so /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility0.so /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility1.so /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule0.so /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule1.so /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule2.so /lib64/libpthread-2.5.so /lib64/libdl-2.5.so /lib64/libutil-2.5.so /usr/local/tools/mvapich-intel-1.2/lib/shared/libmpich.so.1.0 /usr/local/tools/icc-11.1.046/lib/intel64/libsvml.so /usr/local/tools/icc-11.1.046/lib/intel64/libintlc.so.5 /lib64/libgcc_s-4.1.2-20080825.so.1 /lib64/libc-2.5.so /usr/lib64/libpsm_infinipath.so.1.13 /usr/lib64/libpmi.so.0.0.0 /lib64/librt-2.5.so /usr/local/tools/icc-9.1.052/lib/libirc.so /usr/lib64/libinfinipath.so.4.0 /usr/lib64/libslurm.so.21.0.0
 ---- processing /usr/local/tools/icc-11.1.046/lib/intel64/libimf.so, measurement unit in Byte ---
 Image Name: /usr/local/tools/icc-11.1.046/lib/intel64/libimf.so
 Image size: 2662610
@@ -16,84 +17,44 @@ Size of symbol table: 43200
 Size of string table: 15664
 ---- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility0.so, measurement unit in Byte ---
 Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility0.so
-Image size: 11585
-Text size: 2585
-Data size: 528
-Size of debug section: 3280
-Size of symbol table: 1560
-Size of string table: 465
+Image size: 14428
+Text size: 3670
+Data size: 552
+Size of debug section: 4834
+Size of symbol table: 1632
+Size of string table: 516
 ---- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility1.so, measurement unit in Byte ---
 Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility1.so
-Image size: 9286
-Text size: 1772
-Data size: 504
-Size of debug section: 2028
-Size of symbol table: 1464
-Size of string table: 414
----- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility2.so, measurement unit in Byte ---
-Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility2.so
-Image size: 11000
-Text size: 2390
-Data size: 520
-Size of debug section: 2945
-Size of symbol table: 1536
-Size of string table: 448
----- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility3.so, measurement unit in Byte ---
-Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility3.so
-Image size: 8509
-Text size: 1473
-Data size: 496
-Size of debug section: 1522
-Size of symbol table: 1464
-Size of string table: 397
----- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility4.so, measurement unit in Byte ---
-Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libutility4.so
-Image size: 8461
-Text size: 1457
-Data size: 496
-Size of debug section: 1491
-Size of symbol table: 1464
-Size of string table: 397
+Image size: 14925
+Text size: 3817
+Data size: 560
+Size of debug section: 5200
+Size of symbol table: 1656
+Size of string table: 533
 ---- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule0.so, measurement unit in Byte ---
 Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule0.so
-Image size: 16979
-Text size: 2570
-Data size: 696
-Size of debug section: 8246
-Size of symbol table: 1680
-Size of string table: 531
+Image size: 30144
+Text size: 7654
+Data size: 816
+Size of debug section: 15181
+Size of symbol table: 2184
+Size of string table: 880
 ---- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule1.so, measurement unit in Byte ---
 Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule1.so
-Image size: 21591
-Text size: 4444
-Data size: 776
-Size of debug section: 10592
-Size of symbol table: 1872
-Size of string table: 663
+Image size: 27455
+Text size: 6795
+Data size: 816
+Size of debug section: 13635
+Size of symbol table: 2136
+Size of string table: 847
 ---- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule2.so, measurement unit in Byte ---
 Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule2.so
-Image size: 17958
-Text size: 2937
-Data size: 736
-Size of debug section: 8690
-Size of symbol table: 1752
-Size of string table: 582
----- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule3.so, measurement unit in Byte ---
-Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule3.so
-Image size: 18862
-Text size: 3149
-Data size: 736
-Size of debug section: 8824
-Size of symbol table: 1752
-Size of string table: 582
----- processing /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule4.so, measurement unit in Byte ---
-Image Name: /g/g0/lee218/src/pynamic/pynamic-pyMPI-2.6a1/libmodule4.so
-Image size: 22129
-Text size: 4714
+Image size: 26044
+Text size: 6088
 Data size: 792
-Size of debug section: 10747
-Size of symbol table: 1920
-Size of string table: 697
+Size of debug section: 13047
+Size of symbol table: 2064
+Size of string table: 796
 ---- processing /lib64/libpthread-2.5.so, measurement unit in Byte ---
 Image Name: /lib64/libpthread-2.5.so
 Image size: 142696
@@ -209,10 +170,10 @@ Size of string table: 51222
 
 
 ************************************************
-Size of aggregate total of shared libraries: 14.2MB
+Size of aggregate total of shared libraries: 14.1MB
 Size of aggregate texts of shared libraries: 8.1MB
-Size of aggregate data of shared libraries: 107.3KB
+Size of aggregate data of shared libraries: 104.5KB
 Size of aggregate debug sections of shared libraries: 4.5MB
-Size of aggregate symbol tables of shared libraries: 885.5KB
-Size of aggregate string table size of shared libraries: 422.0KB
+Size of aggregate symbol tables of shared libraries: 878.7KB
+Size of aggregate string table size of shared libraries: 420.4KB
 ************************************************
