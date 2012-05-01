@@ -11,7 +11,7 @@
 
 which ap >& /dev/null
 hasap=$?
-if test $? -eq 0
+if test $hasap -eq 0
 then
     sharedlib=`ldd $1 | gawk '{ print $3}' | xargs ap`
 else

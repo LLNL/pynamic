@@ -10,7 +10,7 @@ MPIRUNEXE=
 MPIRUN=/usr/local/bin/mpirun
 POE=
 PYMPI=./pyMPI
-LOCAL_PROCESSORS=12
+LOCAL_PROCESSORS=16
 
 # Automake sets the srcdir as an environment variable, but we may be
 # debugging if it is not set
