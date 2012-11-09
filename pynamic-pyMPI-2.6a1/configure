@@ -6569,7 +6569,6 @@ if test "${with_libs+set}" = set; then
 
   echo "$as_me:$LINENO: result: $withval" >&5
 echo "${ECHO_T}$withval" >&6
-  LIBS="$withval $LIBS"
   PYNAMICLIBS="$withval"
   EXPLICIT_LIBS="$withval"
 

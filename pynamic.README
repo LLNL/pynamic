@@ -2,6 +2,9 @@
 # FILE: pynamic.README
 #
 # Updates: 
+#          Nov 01 2012 GLL: Fixed build of vanilla pyMPI (via configure)
+#                           Cleaned up generation of pynamic_driver.py
+#                           Modified get-symtab-sizes to be more portable/robust
 #          Jun 17 2011 GLL: Updated to pyMPI-2.6a1
 #          Mar 12 2007 DHA: change the suggested parameter
 #                           set to simulate an important multi-
@@ -12,7 +15,6 @@
 #          Jan 30 2007 DHA: file created	
 #                           So far, Linux/x86 and 
 #			    and Linux/x86-64 support
-#			    Near-term TODO: AIX support
 #				
 #
 #
@@ -28,9 +30,7 @@
    3.1 TO BUILD
    3.2 TO TEST
 
-4. VERSION 1.0 SOURCE TREE
-
-5. CONTACTS
+4. CONTACTS
 
 --------------------------------------------------------
 1. OVERVIEW 
@@ -165,139 +165,7 @@
     #    pynamic-pyMPI - pyMPI with the generated .so's linked in
 
 --------------------------------------------------------
-4. VERSION 1.0 SOURCE TREE
-   .
-   |-- pynamic-pyMPI-2.4b4
-   |   |-- AUTHORS
-   |   |-- COPYING
-   |   |-- ChangeLog
-   |   |-- INSTALL
-   |   |-- LICENSE.TXT
-   |   |-- Makefile.am
-   |   |-- Makefile.in
-   |   |-- NEWS
-   |   |-- README
-   |   |-- aclocal.m4
-   |   |-- addall.c
-   |   |-- advanced_extension
-   |   |   |-- advanced.c
-   |   |   |-- setup.py
-   |   |   `-- test.py
-   |   |-- benchmarks
-   |   |   |-- benchmark.py
-   |   |   `-- cbenchmark.c
-   |   |-- cloning_pyMPI
-   |   |   |-- Makefile
-   |   |   `-- conan.c
-   |   |-- config.guess
-   |   |-- config.sub
-   |   |-- config_pynamic.py
-   |   |-- configure
-   |   |-- configure.ac
-   |   |-- docs
-   |   |   |-- Makefile
-   |   |   |-- README
-   |   |   |-- developers_guidance.xml
-   |   |   |-- developers_overview.xml
-   |   |   |-- extenders_guide.xml
-   |   |   |-- how_it_works.xml
-   |   |   |-- overview.xml
-   |   |   |-- pyMPI.pdf
-   |   |   `-- xml2ps.py
-   |   |-- examples
-   |   |   `-- fractal.py
-   |   |-- get-symtab-sizes
-   |   |-- initmpi.h
-   |   |-- install-sh
-   |   |-- micro_tests
-   |   |   `-- pyMPI_default_test
-   |   |-- missing
-   |   |-- mkinstalldirs
-   |   |-- mpicomm.h
-   |   |-- parallel_test
-   |   |-- pyMPI.c
-   |   |-- pyMPI.h
-   |   |-- pyMPI_Config.h
-   |   |-- pyMPI_Config.h.in
-   |   |-- pyMPI_Externals.h
-   |   |-- pyMPI_Macros.h
-   |   |-- pyMPI_Types.h
-   |   |-- pyMPI_banner.c
-   |   |-- pyMPI_cart.c
-   |   |-- pyMPI_comm.c
-   |   |-- pyMPI_comm_asynchronous.c
-   |   |-- pyMPI_comm_collective.c
-   |   |-- pyMPI_comm_io.c
-   |   |-- pyMPI_comm_map.c
-   |   |-- pyMPI_comm_message.c
-   |   |-- pyMPI_comm_misc.c
-   |   |-- pyMPI_configuration.c
-   |   |-- pyMPI_distutils.c
-   |   |-- pyMPI_file.c
-   |   |-- pyMPI_init.c
-   |   |-- pyMPI_initialize.c
-   |   |-- pyMPI_isatty.c
-   |   |-- pyMPI_linker.c
-   |   |-- pyMPI_main.c
-   |   |-- pyMPI_pickle.c
-   |   |-- pyMPI_pipes.c
-   |   |-- pyMPI_rco.c
-   |   |-- pyMPI_readline.c
-   |   |-- pyMPI_recv.c
-   |   |-- pyMPI_reductions.c
-   |   |-- pyMPI_request.c
-   |   |-- pyMPI_send.c
-   |   |-- pyMPI_shared_file.c
-   |   |-- pyMPI_signals.c
-   |   |-- pyMPI_site.c
-   |   |-- pyMPI_softload.c
-   |   |-- pyMPI_status.c
-   |   |-- pyMPI_sysmods.c
-   |   |-- pyMPI_user_banner.c
-   |   |-- pyMPI_user_directory.c
-   |   |-- pyMPI_user_fini.c
-   |   |-- pyMPI_user_init.c
-   |   |-- pyMPI_user_startup.c
-   |   |-- pyMPI_util.c
-   |   |-- scaling
-   |   |   |-- allreduce.py
-   |   |   |-- pingpong.c
-   |   |   |-- pingpongtest.py
-   |   |   `-- setup.py
-   |   |-- simple_extension
-   |   |   |-- setup.py
-   |   |   |-- simple.c
-   |   |   `-- test.py
-   |   |-- so_generator.py
-   |   |-- softload_setup.py
-   |   |-- softload_setup.py.in
-   |   |-- swig_example
-   |   |   |-- example.i
-   |   |   |-- examplecode.c
-   |   |   |-- setup.py
-   |   |   `-- test.py
-   |   |-- unittest
-   |   |   |-- PyMPITest.py
-   |   |   |-- extension.py
-   |   |   |-- gathers.py
-   |   |   |-- popen.py
-   |   |   |-- reduces.py
-   |   |   |-- run-all-tests.in
-   |   |   `-- scatters.py
-   |   `-- utils
-   |       |-- checkdistribution.py
-   |       |-- crontest
-   |       |-- editMakefile.py
-   |       |-- expose_configuration.py
-   |       |-- findExternals.py
-   |       `-- grind_docs_and_prototypes.py
-   |-- pynamic.LICENSE
-   `-- pynamic.README
-    
-   12 directories, 114 files
- 
---------------------------------------------------------
-5. CONTACTS 
+4. CONTACTS 
    Greg Lee <lee218@llnl.gov>	
    Dong Ahn <ahn1@llnl.gov>
    Bronis de Supinski <desupinski1@llnl.gov>

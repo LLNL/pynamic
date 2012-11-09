@@ -1,4 +1,4 @@
-#!/bin/ksh
+#!/bin/sh
 
 #
 # Please see COPYRIGHT information at the end of this file.
@@ -9,24 +9,33 @@
 # and produce size information.   
 #
 
-sharedlib=`ldd $1 | gawk '{ print $3}' | xargs ap`
+which ap &> /dev/null
+if test $? -eq 0
+then
+    sharedlib=`ldd $1 | gawk '{ print $3}' | xargs ap`
+else
+    sharedlib=`ldd $1 | gawk '{ print $3}'`
+fi
 
 rm -f 00imagesize 00debugsectsize 00symtabsize 00strtabsize 00textsize 00datasize
 
 for sh in $sharedlib; do 
-	echo "---- processing $sh, measurement unit in Byte ---"
-	echo "Image Name: $sh" 
-	ls -l $sh | gawk '{ print "Image size: "$5}' | tee -a 00imagesize 
-	size -f $sh | gawk '{if ($1 ~ /[0-9]+/) print "Text size: "$1}' | tee -a 00textsize
-        size -f $sh | gawk '{if ($2 ~ /[0-9]+/) print "Data size: "$2}' | tee -a 00datasize
-	readelf -S -W $sh | gawk '{if ($2 ~ /\.debug/ ) print $6}' | addall "debug section" 16 | tee -a 00debugsectsize
-	readelf -S -W $sh | gawk '{if ($2 ~ /\.symtab/ ) print $6}' | addall "symbol table" 16 | tee -a 00symtabsize
-	readelf -S -W $sh | gawk '{if ($2 ~ /\.strtab/ ) print $6}' | addall "string table" 16 | tee -a 00strtabsize
+    if test -e $sh
+    then
+	    echo "---- processing $sh, measurement unit in Byte ---"
+	    echo "Image Name: $sh" 
+	    ls -l $sh | gawk '{ print "Image size: "$5}' | tee -a 00imagesize 
+	    size -f $sh | gawk '{if ($1 ~ /[0-9]+/) print "Text size: "$1}' | tee -a 00textsize
+            size -f $sh | gawk '{if ($2 ~ /[0-9]+/) print "Data size: "$2}' | tee -a 00datasize
+	    readelf -S -W $sh | gawk '{if ($2 ~ /\.debug/ ) print $6}' | addall "debug section" 16 | tee -a 00debugsectsize
+	    readelf -S -W $sh | gawk '{if ($2 ~ /\.symtab/ ) print $6}' | addall "symbol table" 16 | tee -a 00symtabsize
+	    readelf -S -W $sh | gawk '{if ($2 ~ /\.strtab/ ) print $6}' | addall "string table" 16 | tee -a 00strtabsize
+    fi
 done
 
-print ""
-print ""
-print "************************************************"
+echo ""
+echo ""
+echo "************************************************"
 
 cat 00imagesize | gawk '{ print $3 }' | addall "aggregate total of shared libraries" 10 -h
 cat 00textsize | gawk '{ print $3 }' | addall "aggregate texts of shared libraries" 10 -h
@@ -35,7 +44,7 @@ cat 00debugsectsize | gawk '{ print $5 }' | addall "aggregate debug sections of 
 cat 00symtabsize | gawk '{ print $5 }' | addall "aggregate symbol tables of shared libraries" 10 -h
 cat 00strtabsize | gawk '{ print $5 }' | addall "aggregate string table size of shared libraries" 10 -h
 
-print "************************************************"
+echo "************************************************"
 
 rm -f 00imagesize 00debugsectsize 00symtabsize 00strtabsize 00textsize 00datasize
 

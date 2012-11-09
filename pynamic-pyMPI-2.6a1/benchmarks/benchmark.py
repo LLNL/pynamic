@@ -1,4 +1,4 @@
-import Numeric
+import numpy
 import mpi
 import os
 from distutils.core import setup, Extension
@@ -43,7 +43,7 @@ def TIMER_ELAPSED():
     global __time
     return __time
 
-message = Numeric.array(MAX_MESSAGE_SIZE*"a")
+message = numpy.array(MAX_MESSAGE_SIZE*"a")
 
 master = 0
 slave = mpi.size-1

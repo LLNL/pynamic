@@ -32,22 +32,26 @@ import os.path
 # run the so_generator
 #
 if len(sys.argv) < 3:
-    print_usage('config_pynamic.py')
+    print_usage('config_pynamic.bgq.py')
     sys.exit(1)
-configure_args, python_command = parse_and_run('config_pynamic.py')
+configure_args, python_command = parse_and_run('config_pynamic.bgq.py')
 
 #
 # configure pyMPI with the pynamic-generated libraries
 #
 cwd = os.getcwd()
-command = './configure --with-prompt-nl --with-isatty '
-command += ' --with-python=%s ' %(python_command)
-command += '--with-libs=\'-Wl,-rpath=' + cwd + ' -L' + cwd + ' '
+command = ''
+#command = 'env CC=/bgsys/drivers/ppcfloor/gnu-linux/bin/powerpc64-bgq-linux-gcc CXX=/bgsys/drivers/ppcfloor/gnu-linux/bin/powerpc64-bgq-linux-g++ CFLAGS="-g -O -I/bgsys/drivers/ppcfloor/comm/gcc/include" '
+command += './configure --with-prompt-nl --with-isatty '
+#command += '--with-includes="-I/bgsys/drivers/ppcfloor/comm/gcc/include" '
+#command += '--with-python=%s ' %(python_command)
+#command += '--with-libs="-L/bgsys/drivers/ppcfloor/comm/gcc.legacy/lib -lmpich -lmpl -lopa -L/bgsys/drivers/ppcfloor/comm/sys/lib -lpami -L/bgsys/drivers/ppcfloor/spi/lib -lSPI_cnk -lrt -lpthread -Wl,-rpath=' + cwd + ' -L' + cwd + ' '
+command += '--with-libs="'
 for p, d, f in os.walk('./'):
     for file in f:
         if file.find('.so') != -1 and file.find('lib') != -1:
             command += '-l' + file[3:file.find('.')] + ' '
-command += '\' '
+command += '" '
 for arg in configure_args:
     command += arg + ' '
 print(command)

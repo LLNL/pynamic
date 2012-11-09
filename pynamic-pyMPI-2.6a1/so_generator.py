@@ -215,89 +215,82 @@ def compile_file(file_prefix, i, num_utility_files, include_dir):
 def create_driver(num_files, timing):
     filename = 'pynamic_driver.py'
     f = open(filename, "w")
-    f.write('import sys, os\n')
-    if timing == True:
-        f.write('import time\n')
-        f.write('end_time = time.time()\n')
-        f.write('start_time = 0\n')
+    text ="""import sys, os
+import time
+end_time = time.time()
+start_time = 0
+mpi_avail = True
+try:
+    import mpi
+except:
+    class dummy_mpi:
+        def __init__(self):
+            self.rank = 0
+            self.procs = 1
+        def barrier(self):
+            pass
+    mpi = dummy_mpi()
+    mpi_avail = False
+            
+mpi.barrier()
+if mpi.rank == 0:
+    print('Pynamic: Sequoia Benchmark Version 1.1.1')
+    print('Pynamic: run on %s with %s MPI tasks\\n' %(time.strftime("%x %X"), mpi.procs))
+    if len(sys.argv) > 1:
+        start_time = float(sys.argv[1])
+        print('Pynamic: startup time = ' + str(end_time - start_time) + ' secs')
+    print('Pynamic: driver beginning... now importing modules')
 
-    f.write('mpi_avail = True\n')
-    f.write('try:\n')
-    f.write('\timport mpi\n')
-    f.write('except:\n')
-    f.write('\tmpi_avail = False\n')
-    f.write('if mpi_avail == False:\n')
-    if timing == True:
-        f.write('\tprint \'Sequoia Benchmark Version 1.1.0\\n\'\n')
-        f.write('\tif len(sys.argv) > 1:\n')
-        f.write('\t\tstart_time = float(sys.argv[1])\n')
-        f.write('\t\tprint \'startup time = \' + str(end_time - start_time) + \' secs\'\n')
-        
-    f.write('\tprint \'pynamic driver beginning... now importing modules\'\n')
-    f.write('else:\n')
-    f.write('\tif mpi.rank == 0:\n')
-    if timing == True:
-        f.write('\t\tprint \'Sequoia Benchmark Version 1.1.0\\n\'\n')
-        f.write('\t\tif len(sys.argv) > 1:\n')
-        f.write('\t\t\tstart_time = float(sys.argv[1])\n')
-        f.write('\t\t\tprint \'startup time = \' + str(end_time - start_time) + \' secs\'\n')
-
-    f.write('\t\tprint \'pynamic driver beginning... now importing modules\'\n')
-
-    #test module coverage
-    if timing == True:
-        f.write('import_start = time.time()\n')
+    import_start = time.time()
+"""
+    f.write(text)
 
     for i in range(num_files):
         f.write('import libmodule' + str(i) + '\n')
-    if timing == True:
-        f.write('import_end = time.time()\n')
-        f.write('import_time = import_end - import_start\n')
-    f.write('if mpi_avail == False:\n')
-    f.write('\tprint \'pynamic driver finished importing all modules... visiting all module functions\'\n')
-    f.write('else:\n')
-    f.write('\tif mpi.rank == 0:\n')
-    f.write('\t\tprint \'pynamic driver finished importing all modules... visiting all module functions\'\n')
-    if timing == True:
-        f.write('call_start = time.time()\n')
+
+    text = """mpi.barrier()
+if mpi.rank == 0:    
+    import_end = time.time()
+    import_time = import_end - import_start
+    print('Pynamic: driver finished importing all modules... visiting all module functions')
+
+    call_start = time.time()
+"""
+    f.write(text)
+
     for i in range(num_files):
         f.write('libmodule' + str(i) + '.libmodule' + str(i) + '_entry()\n')
-    if timing == True:
-        f.write('call_end = time.time()\n')
-        f.write('call_time = call_end - call_start\n')
-        
-    f.write('if mpi_avail == False:\n')
-    if timing == True:
-        f.write('\tprint \'\\nPynamic: module import time = \' + str(import_time) + \' secs\'\n')
-        f.write('\tprint \'Pynamic: module visit time = \' + str(call_time) + \' secs\'\n')
-    f.write('\tprint \'Pynamic: module test passed!\\n\'\n')
-    f.write('\tsys.exit(0)\n\n')
-    if timing == True:
-        f.write('import_time = mpi.reduce(import_time, mpi.SUM)\n')
-        f.write('call_time = mpi.reduce(call_time, mpi.SUM)\n')
-    f.write('if mpi.rank == 0:\n')
-    if timing == True:
-        f.write('\timport_time = import_time / mpi.size\n')
-        f.write('\tcall_time = call_time / mpi.size\n')
-        f.write('\tprint \'\\nPynamic: module import time = \' + str(import_time) + \' secs\'\n')
-        f.write('\tprint \'Pynamic: module visit time = \' + str(call_time) + \' secs\'\n')
-    f.write('\tprint \'Pynamic: module test passed!\\n\'\n')
-    f.write('\tprint \'Pynamic: testing mpi capability...\\n\'\n')
+
+    text = """mpi.barrier()
+if mpi.rank == 0:
+    call_end = time.time()
+    call_time = call_end - call_start
+    print('Pynamic: module import time = ' + str(import_time) + ' secs')
+    print('Pynamic: module visit time = ' + str(call_time) + ' secs')
+    print('Pynamic: module test passed!\\n')
+if mpi_avail == False:
+    sys.exit(0)
+
+if mpi.rank == 0:
+    print('Pynamic: testing mpi capability...\\n')
+    mpi_start = time.time()
+"""
+    f.write(text)
 
     #test mpi capabilities
     fractal_file = open('./examples/fractal.py', 'r')
     lines = fractal_file.readlines()
-    if timing == True:
-        f.write('mpi_start = time.time()\n')
     for line in lines:
         f.write(line)
-    f.write('mpi.barrier()\n')    
-    if timing == True:
-        f.write('mpi_end = time.time()\n')
-    f.write('if mpi.rank == 0:\n')
-    if timing == True:
-        f.write('\tprint \'\\nPynamic: fractal mpi time = \' + str(mpi_end - mpi_start) + \' secs\'\n')
-    f.write('\tprint \'Pynamic: mpi test passed!\\n\'\n')    
+
+    text = """mpi.barrier()
+if mpi.rank == 0:
+    mpi_end = time.time()
+    print '\\nPynamic: fractal mpi time = ' + str(mpi_end - mpi_start) + ' secs'
+    print 'Pynamic: mpi test passed!\\n'
+"""
+    f.write(text)
+
     f.close()    
 
 #create a function list    (type + args quantity and types)
