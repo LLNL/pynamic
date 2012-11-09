@@ -192,11 +192,11 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
     f.close()    
 
 # compile a .c file into a Python-usable .so file
-def compile_file(file_prefix, i, num_utility_files, include_dir):
+def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
     filename = file_prefix + '.c'
     cwd = os.getcwd()
     outfile = file_prefix + '.so'
-    command = 'gcc -g -fPIC -shared'
+    command = '%s -g -fPIC -shared' %(CC)
     if file_prefix.find('module') != -1:
         command += ' -I%s' %(include_dir)
         command += ' -Wl,-rpath=' + cwd + ' -L' + cwd
@@ -309,7 +309,7 @@ def create_function_list(num_functions):
     return functions    
     
 #the main driver
-def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, timing, name_length, include_dir):
+def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, timing, name_length, include_dir, CC):
 
     for p,d,f in os.walk('./'):
         if p == './':
@@ -340,7 +340,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
             pynamic_header_file.write('#include "' + file_prefix + str(i) + '.h"\n')
             generate_c_file(file_prefix, i, num_functions, call_depth, extern, utility_enabled, fun_print, name_length)
             file_prefix += str(i)
-            compile_file(file_prefix, i, num_utility_files, include_dir)
+            compile_file(file_prefix, i, num_utility_files, include_dir, CC)
         pynamic_header_file.close()    
     
     for i in range(num_files - num_utility_files):
@@ -348,7 +348,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         file_prefix = 'libmodule'  
         generate_c_file(file_prefix, i, num_functions, call_depth, extern, utility_enabled, fun_print, name_length)
         file_prefix += str(i)
-        compile_file(file_prefix, i, num_utility_files, include_dir)
+        compile_file(file_prefix, i, num_utility_files, include_dir, CC)
     
     print('Generating driver...')
     create_driver(num_files - num_utility_files, timing)
@@ -378,6 +378,8 @@ def print_usage(executable):
     print('\tcreate <num_utility_mods> math library-like utility modules')
     print('\twith an average of <avg_num_u_functions> functions')
     print('\tNOTE: Number of python modules = <num_files> - <avg_num_u_functions>\n')
+    print('--with-cc=<command>')
+    print('\tuse the C compiler located at <command> to build Pynamic modules.\n')
     print('--with-python=<command>')
     print('\tuse the python located at <command> to build Pynamic modules.  Will')
     print('\talso be passed to the pyMPI configure script.\n')
@@ -408,6 +410,7 @@ def parse_and_run(executable):
         include_dir = ''
         configure_args = []
         python_command = 'python'
+        CC = 'gcc'
         
         for i in range(3, len(sys.argv)):
             if next == 0:
@@ -437,6 +440,8 @@ def parse_and_run(executable):
                 elif sys.argv[i] == '-c':    
                     configure_args += sys.argv[i+1:]
                     next = 99999
+                elif sys.argv[i].find('--with-cc=') != -1:
+                    CC = sys.argv[i][10:]
                 elif sys.argv[i].find('--with-python=') != -1:
                     configure_args.append(sys.argv[i])
                     python_command = sys.argv[i][14:]
@@ -465,7 +470,7 @@ def parse_and_run(executable):
         print('#############################')
         print_usage(executable)
     
-    run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, timing, name_length, include_dir)
+    run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, timing, name_length, include_dir, CC)
 
     return configure_args, python_command
     

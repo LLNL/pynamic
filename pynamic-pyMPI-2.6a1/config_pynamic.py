@@ -92,7 +92,7 @@ if os.path.exists('./get-symtab-sizes') != True:
     print_error('required file get-symtab-sizes not found!')
 
 os.system('rm -f sharedlib_section_info')
-command = "get-symtab-sizes pynamic-pyMPI > sharedlib_section_info"
+command = "./get-symtab-sizes pynamic-pyMPI > sharedlib_section_info"
 print(command)
 ret = os.system(command)
 if ret != 0:

@@ -27,8 +27,11 @@ hostinfo               = unknown
 /usr/bin/oslevel       = unknown
 /bin/universe          = unknown
 
+PATH: .
 PATH: /usr/global/tools/ddt/default/bin
 PATH: /usr/global/tools/totalview/m/rzedgelet/dflt/bin
+PATH: /g/g0/lee218/install/bin
+PATH: /g/g0/lee218/install/chaos_5_x86_64_ib/bin
 PATH: /collab/usr/global/tools/stat/chaos_5_x86_64_ib/stat-test/bin
 PATH: .
 PATH: /g/g0/lee218/install/bin
@@ -764,8 +767,8 @@ configure:7259: $? = 0
 configure:7262: result: yes
 configure:7346: checking for Py_ReadOnlyBytecodeFlag
 configure:7403: /usr/local/bin/mpiicc -o conftest -g -O2 -fPIC  -I/usr/apps/python2.7.1/include/python2.7 -I/usr/apps/python2.7.1/include/python2.7 -I/usr/apps/python2.7.1/lib/python2.7/site-packages/numpy/core/include -I/usr/apps/python2.7.1/include/python2.7 -I/usr/apps/python2.7.1/lib/python2.7/site-packages/numpy/core/include  conftest.c -lm  -L/usr/apps/python2.7.1/lib/python2.7/config -lpython2.7  -Xlinker -export-dynamic   -lpthread -ldl  -lutil   >&5
-/var/tmp/lee218/icc56YlMr.o:(.data+0x0): undefined reference to `Py_ReadOnlyBytecodeFlag'
-/var/tmp/lee218/icc56YlMr.o: In function `main':
+/var/tmp/lee218/iccRrFwdT.o:(.data+0x0): undefined reference to `Py_ReadOnlyBytecodeFlag'
+/var/tmp/lee218/iccRrFwdT.o: In function `main':
 /g/g0/lee218/bgq/python/pynamic-1.1.bgq/pynamic-pyMPI-2.6a1/conftest.c:85: undefined reference to `Py_ReadOnlyBytecodeFlag'
 configure:7409: $? = 1
 configure: failed program was:
@@ -1078,8 +1081,8 @@ configure:7951: checking for pm_util.h
 configure:7958: result: no
 configure:7975: checking for mpc_flush
 configure:8032: /usr/local/bin/mpiicc -o conftest -g -O2 -fPIC  -I/usr/apps/python2.7.1/include/python2.7 -I/usr/apps/python2.7.1/include/python2.7 -I/usr/apps/python2.7.1/lib/python2.7/site-packages/numpy/core/include -I/usr/apps/python2.7.1/include/python2.7 -I/usr/apps/python2.7.1/lib/python2.7/site-packages/numpy/core/include  conftest.c -lm  -L/usr/apps/python2.7.1/lib/python2.7/config -lpython2.7  -Xlinker -export-dynamic   -lpthread -ldl  -lutil   >&5
-/var/tmp/lee218/iccvB08rt.o:(.data+0x0): undefined reference to `mpc_flush'
-/var/tmp/lee218/iccvB08rt.o: In function `main':
+/var/tmp/lee218/iccmYb0Dj.o:(.data+0x0): undefined reference to `mpc_flush'
+/var/tmp/lee218/iccmYb0Dj.o: In function `main':
 /g/g0/lee218/bgq/python/pynamic-1.1.bgq/pynamic-pyMPI-2.6a1/conftest.c:90: undefined reference to `mpc_flush'
 configure:8038: $? = 1
 configure: failed program was:
@@ -1179,8 +1182,8 @@ configure: failed program was:
 configure:8063: result: no
 configure:8077: checking for mpc_isatty
 configure:8134: /usr/local/bin/mpiicc -o conftest -g -O2 -fPIC  -I/usr/apps/python2.7.1/include/python2.7 -I/usr/apps/python2.7.1/include/python2.7 -I/usr/apps/python2.7.1/lib/python2.7/site-packages/numpy/core/include -I/usr/apps/python2.7.1/include/python2.7 -I/usr/apps/python2.7.1/lib/python2.7/site-packages/numpy/core/include  conftest.c -lm  -L/usr/apps/python2.7.1/lib/python2.7/config -lpython2.7  -Xlinker -export-dynamic   -lpthread -ldl  -lutil   >&5
-/var/tmp/lee218/iccGRHJ7Y.o:(.data+0x0): undefined reference to `mpc_isatty'
-/var/tmp/lee218/iccGRHJ7Y.o: In function `main':
+/var/tmp/lee218/iccoeiQBQ.o:(.data+0x0): undefined reference to `mpc_isatty'
+/var/tmp/lee218/iccoeiQBQ.o: In function `main':
 /g/g0/lee218/bgq/python/pynamic-1.1.bgq/pynamic-pyMPI-2.6a1/conftest.c:90: undefined reference to `mpc_isatty'
 configure:8140: $? = 1
 configure: failed program was:
