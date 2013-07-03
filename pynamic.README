@@ -2,9 +2,12 @@
 # FILE: pynamic.README
 #
 # Updates: 
+#          Jul 03 2013 GLL: Create pyMPI, pynamic-pyMPI, and pynamic-bigexe
+#                           get-symtab-sizes update to include base executable
 #          Nov 01 2012 GLL: Fixed build of vanilla pyMPI (via configure)
 #                           Cleaned up generation of pynamic_driver.py
 #                           Modified get-symtab-sizes to be more portable/robust
+#          Feb 16 2012 JCG: Hacked in generation of ~200MB pyMPI executable
 #          Jun 17 2011 GLL: Updated to pyMPI-2.6a1
 #          Mar 12 2007 DHA: change the suggested parameter
 #                           set to simulate an important multi-

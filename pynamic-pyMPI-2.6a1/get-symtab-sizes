@@ -13,10 +13,12 @@ which ap >& /dev/null
 hasap=$?
 if test $hasap -eq 0
 then
-    sharedlib=`ldd $1 | gawk '{ print $3}' | xargs ap`
+    sharedlib=`ldd $1 | gawk '{ print $3}' | xargs ap | grep -i -v "file not found"`
 else
-    sharedlib=`ldd $1 | gawk '{ print $3}' | xargs grep '.so'`
+    sharedlib=`ldd $1 | gawk '{ print $3}' | xargs grep '.so' | grep -i -v "file not found"`
 fi
+
+sharedlib="$1 $sharedlib"
 
 rm -f 00imagesize 00debugsectsize 00symtabsize 00strtabsize 00textsize 00datasize
 
