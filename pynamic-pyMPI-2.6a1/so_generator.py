@@ -234,7 +234,7 @@ except:
             
 mpi.barrier()
 if mpi.rank == 0:
-    print('Pynamic: Sequoia Benchmark Version 1.1.1')
+    print('Pynamic: Version 1.2')
     print('Pynamic: run on %s with %s MPI tasks\\n' %(time.strftime("%x %X"), mpi.procs))
     if len(sys.argv) > 1:
         start_time = float(sys.argv[1])
@@ -349,7 +349,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         generate_c_file(file_prefix, i, num_functions, call_depth, extern, utility_enabled, fun_print, name_length)
         file_prefix += str(i)
         compile_file(file_prefix, i, num_utility_files, include_dir, CC)
-    
+
     print('Generating driver...')
     create_driver(num_files - num_utility_files, timing)
     print('Done!\n')

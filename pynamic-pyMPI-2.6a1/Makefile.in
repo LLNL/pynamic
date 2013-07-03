@@ -83,6 +83,16 @@ AR = ar
 ARFLAGS = cru
 libpyMPI_a_AR = $(AR) $(ARFLAGS)
 libpyMPI_a_LIBADD =
+PYNAMIC_BIGEXE_OBJS = foo0.$(OBJEXT) \
+        foo1.$(OBJEXT) \
+        foo2.$(OBJEXT) \
+        foo3.$(OBJEXT) \
+        foo4.$(OBJEXT) \
+        foo5.$(OBJEXT) \
+        foo6.$(OBJEXT) \
+        foo7.$(OBJEXT) \
+        foo8.$(OBJEXT) \
+        foo9.$(OBJEXT) 
 am_libpyMPI_a_OBJECTS = pyMPI_banner.$(OBJEXT) pyMPI_cart.$(OBJEXT) \
 	pyMPI_configuration.$(OBJEXT) pyMPI_comm.$(OBJEXT) \
 	pyMPI_comm_asynchronous.$(OBJEXT) \
@@ -388,6 +398,7 @@ CLEANFILES = augmentedMakefile pyMPI.exp \
 	pyMPI_configuration.c \
 	extensiontest.* \
 	pynamic-pyMPI$(EXEEXT) \
+	pynamic-bigexe$(EXEEXT) \
 	pyMPI$(version)$(EXEEXT) \
 	pyMPI$(version)_linker$(EXEEXT) \
 	pyMPI_linker$(EXEEXT) \
@@ -494,7 +505,7 @@ uninstall-libLIBRARIES:
 
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
-libpyMPI.a: $(libpyMPI_a_OBJECTS) $(libpyMPI_a_DEPENDENCIES) 
+libpyMPI.a: $(libpyMPI_a_OBJECTS) $(libpyMPI_a_DEPENDENCIES) $(PYNAMIC_BIGEXE_OBJS)
 	-rm -f libpyMPI.a
 	$(libpyMPI_a_AR) libpyMPI.a $(libpyMPI_a_OBJECTS) $(libpyMPI_a_LIBADD)
 	$(RANLIB) libpyMPI.a
@@ -528,8 +539,10 @@ clean-noinstPROGRAMS:
 pyMPI$(EXEEXT): $(pyMPI_OBJECTS) $(pyMPI_DEPENDENCIES) 
 	@rm -f pyMPI$(EXEEXT)
 	@rm -f pynamic-pyMPI$(EXEEXT)
+	@rm -f pynamic-bigexe$(EXEEXT)
 	$(LINK) -o $@ $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS)
 	$(LINK) -o pynamic-pyMPI$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS) $(PYNAMICLIBS)
+	$(LINK) -o pynamic-bigexe$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS) $(PYNAMICLIBS) $(PYNAMIC_BIGEXE_OBJS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"

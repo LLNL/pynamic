@@ -76,6 +76,18 @@ int pyMPI_Main_with_communicator(int Python_owns_MPI, int *argc, char ***argv,MP
 
   return status;
 }
+#ifdef PYNAMIC_BIG_EXE
+extern void check0();
+extern void check1();
+extern void check2();
+extern void check3();
+extern void check4();
+extern void check5();
+extern void check6();
+extern void check7();
+extern void check8();
+extern void check9();
+#endif
 
 /**************************************************************************/
 /* GLOBAL **************         pyMPI_Main        ************************/
@@ -87,6 +99,18 @@ int pyMPI_Main(int Python_owns_MPI, int *argc, char ***argv) {
   char* COLOR = 0;
   int color = -1;
 
+#ifdef PYNAMIC_BIG_EXE
+  check0();
+  check1();
+  check2();
+  check3();
+  check4();
+  check5();
+  check6();
+  check7();
+  check8();
+  check9();
+#endif
   return pyMPI_Main_with_communicator(Python_owns_MPI,argc,argv,MPI_COMM_WORLD);
 }
 
