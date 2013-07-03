@@ -4,6 +4,7 @@
 # Updates: 
 #          Jul 03 2013 GLL: Create pyMPI, pynamic-pyMPI, and pynamic-bigexe
 #                           get-symtab-sizes update to include base executable
+#                           tag version 1.2
 #          Nov 01 2012 GLL: Fixed build of vanilla pyMPI (via configure)
 #                           Cleaned up generation of pynamic_driver.py
 #                           Modified get-symtab-sizes to be more portable/robust
