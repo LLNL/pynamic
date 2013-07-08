@@ -20,4 +20,7 @@ output.bmp
 pynamic.h
 pynamic_driver*
 sharedlib_section_info*
+lib*.c
+lib*.h
+micro_tests/
 slurm-*.out
