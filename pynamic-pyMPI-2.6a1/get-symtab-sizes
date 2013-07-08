@@ -9,6 +9,13 @@
 # and produce size information.   
 #
 
+if test -z $LD_LIBRARY_PATH
+then
+	export LD_LIBRARY_PATH=./
+else
+	export LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH
+fi
+
 which ap >& /dev/null
 hasap=$?
 if test $hasap -eq 0
