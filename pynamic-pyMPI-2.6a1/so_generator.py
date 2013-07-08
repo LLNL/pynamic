@@ -212,16 +212,17 @@ def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
         print_error('Failed to compile shared object!  You may need to specify/fix the Python include directory with the -i option')
 
 #create a python driver file
-def create_driver(num_files, timing):
-    filename = 'pynamic_driver.py'
+def create_driver(num_files, timing, filename, mpi_wrapper_text):
     f = open(filename, "w")
-    text ="""import sys, os
+    text = """import sys, os
 import time
 end_time = time.time()
 start_time = 0
 mpi_avail = True
 try:
-    import mpi
+"""
+    text += mpi_wrapper_text
+    text += """    mpi = mpi_wrapper()
 except:
     class dummy_mpi:
         def __init__(self):
@@ -233,9 +234,11 @@ except:
     mpi_avail = False
             
 mpi.barrier()
-if mpi.rank == 0:
-    print('Pynamic: Version 1.2')
-    print('Pynamic: run on %s with %s MPI tasks\\n' %(time.strftime("%x %X"), mpi.procs))
+myRank = mpi.rank
+nProcs = mpi.procs
+if myRank == 0:
+    print('Pynamic: Version 1.3')
+    print('Pynamic: run on %s with %s MPI tasks\\n' %(time.strftime("%x %X"), nProcs))
     if len(sys.argv) > 1:
         start_time = float(sys.argv[1])
         print('Pynamic: startup time = ' + str(end_time - start_time) + ' secs')
@@ -249,7 +252,7 @@ if mpi.rank == 0:
         f.write('import libmodule' + str(i) + '\n')
 
     text = """mpi.barrier()
-if mpi.rank == 0:    
+if myRank == 0:    
     import_end = time.time()
     import_time = import_end - import_start
     print('Pynamic: driver finished importing all modules... visiting all module functions')
@@ -262,7 +265,7 @@ if mpi.rank == 0:
         f.write('libmodule' + str(i) + '.libmodule' + str(i) + '_entry()\n')
 
     text = """mpi.barrier()
-if mpi.rank == 0:
+if myRank == 0:
     call_end = time.time()
     call_time = call_end - call_start
     print('Pynamic: module import time = ' + str(import_time) + ' secs')
@@ -271,7 +274,7 @@ if mpi.rank == 0:
 if mpi_avail == False:
     sys.exit(0)
 
-if mpi.rank == 0:
+if myRank == 0:
     print('Pynamic: testing mpi capability...\\n')
     mpi_start = time.time()
 """
@@ -280,11 +283,11 @@ if mpi.rank == 0:
     #test mpi capabilities
     fractal_file = open('./examples/fractal.py', 'r')
     lines = fractal_file.readlines()
-    for line in lines:
+    for line in lines[1:]:
         f.write(line)
 
     text = """mpi.barrier()
-if mpi.rank == 0:
+if myRank == 0:
     mpi_end = time.time()
     print '\\nPynamic: fractal mpi time = ' + str(mpi_end - mpi_start) + ' secs'
     print 'Pynamic: mpi test passed!\\n'
@@ -351,7 +354,30 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         compile_file(file_prefix, i, num_utility_files, include_dir, CC)
 
     print('Generating driver...')
-    create_driver(num_files - num_utility_files, timing)
+    mpi_wrapper_text = """    import mpi as actual_mpi
+    class mpi_wrapper:
+        def __init__(self):
+            self.rank = actual_mpi.rank
+            self.procs = actual_mpi.procs
+            self.SUM = actual_mpi.SUM
+        def reduce(self, buffer, operation, destination):
+            return actual_mpi.reduce(buffer, operation, destination)
+        def barrier(self):
+            actual_mpi.barrier
+"""
+    create_driver(num_files - num_utility_files, timing, "pynamic_driver.py", mpi_wrapper_text)
+    mpi_wrapper_text = """    from mpi4py import MPI as actual_mpi
+    class mpi_wrapper:
+        def __init__(self):
+            self.rank = actual_mpi.COMM_WORLD.Get_rank()
+            self.procs = actual_mpi.COMM_WORLD.Get_size()
+            self.SUM = actual_mpi.SUM
+        def reduce(self, buffer, operation, destination):
+            return actual_mpi.COMM_WORLD.reduce(buffer, op=operation, root=destination)
+        def barrier(self):
+            return actual_mpi.COMM_WORLD.Barrier()
+"""
+    create_driver(num_files - num_utility_files, timing, "pynamic_driver_mpi4py.py", mpi_wrapper_text)
     print('Done!\n')
 
 def print_usage(executable):    

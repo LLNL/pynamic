@@ -9,6 +9,13 @@
 # and produce size information.   
 #
 
+if test -z $LD_LIBRARY_PATH
+then
+	export LD_LIBRARY_PATH=./
+else
+	export LD_LIBRARY_PATH=./:$LD_LIBRARY_PATH
+fi
+
 which ap >& /dev/null
 hasap=$?
 if test $hasap -eq 0
@@ -22,9 +29,11 @@ sharedlib="$1 $sharedlib"
 
 rm -f 00imagesize 00debugsectsize 00symtabsize 00strtabsize 00textsize 00datasize
 
+num_libs=-1
 for sh in $sharedlib; do 
     if test -e $sh
     then
+        num_libs=`expr $num_libs + 1`
 	    echo "---- processing $sh, measurement unit in Byte ---"
 	    echo "Image Name: $sh" 
 	    ls -l $sh | gawk '{ print "Image size: "$5}' | tee -a 00imagesize 
@@ -39,14 +48,13 @@ done
 echo ""
 echo ""
 echo "************************************************"
-
+echo "summary of $1 executable and $num_libs shared libraries"
 cat 00imagesize | gawk '{ print $3 }' | ./addall "aggregate total of shared libraries" 10 -h
 cat 00textsize | gawk '{ print $3 }' | ./addall "aggregate texts of shared libraries" 10 -h
 cat 00datasize | gawk '{ print $3 }' | ./addall "aggregate data of shared libraries" 10 -h
 cat 00debugsectsize | gawk '{ print $5 }' | ./addall "aggregate debug sections of shared libraries" 10 -h
 cat 00symtabsize | gawk '{ print $5 }' | ./addall "aggregate symbol tables of shared libraries" 10 -h
 cat 00strtabsize | gawk '{ print $5 }' | ./addall "aggregate string table size of shared libraries" 10 -h
-
 echo "************************************************"
 
 rm -f 00imagesize 00debugsectsize 00symtabsize 00strtabsize 00textsize 00datasize
