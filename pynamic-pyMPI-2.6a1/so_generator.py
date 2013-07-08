@@ -237,7 +237,7 @@ mpi.barrier()
 myRank = mpi.rank
 nProcs = mpi.procs
 if myRank == 0:
-    print('Pynamic: Version 1.2')
+    print('Pynamic: Version 1.3')
     print('Pynamic: run on %s with %s MPI tasks\\n' %(time.strftime("%x %X"), nProcs))
     if len(sys.argv) > 1:
         start_time = float(sys.argv[1])
