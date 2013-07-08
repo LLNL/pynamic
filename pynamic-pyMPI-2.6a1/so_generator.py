@@ -212,7 +212,7 @@ def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
         print_error('Failed to compile shared object!  You may need to specify/fix the Python include directory with the -i option')
 
 #create a python driver file
-def create_driver(num_files, timing, filename, mpi_wrapper_text):
+def create_driver(num_files, filename, mpi_wrapper_text):
     f = open(filename, "w")
     text = """import sys, os
 import time
@@ -312,7 +312,7 @@ def create_function_list(num_functions):
     return functions    
     
 #the main driver
-def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, timing, name_length, include_dir, CC):
+def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC):
 
     for p,d,f in os.walk('./'):
         if p == './':
@@ -365,7 +365,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         def barrier(self):
             actual_mpi.barrier
 """
-    create_driver(num_files - num_utility_files, timing, "pynamic_driver.py", mpi_wrapper_text)
+    create_driver(num_files - num_utility_files, "pynamic_driver.py", mpi_wrapper_text)
     mpi_wrapper_text = """    from mpi4py import MPI as actual_mpi
     class mpi_wrapper:
         def __init__(self):
@@ -377,7 +377,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         def barrier(self):
             return actual_mpi.COMM_WORLD.Barrier()
 """
-    create_driver(num_files - num_utility_files, timing, "pynamic_driver_mpi4py.py", mpi_wrapper_text)
+    create_driver(num_files - num_utility_files, "pynamic_driver_mpi4py.py", mpi_wrapper_text)
     print('Done!\n')
 
 def print_usage(executable):    
@@ -399,7 +399,6 @@ def print_usage(executable):
     print('-n <length>\n\tadd <length> characters to the function names\n')
     print('-p\n\tadd a print statement to every generated function\n')
     print('-s <random_seed>\n\tseed to the random number generator\n')
-    print('-t\n\tadd timing metrics to the Pynamic driver\n')
     print('-u <num_utility_mods> <avg_num_u_functions>')
     print('\tcreate <num_utility_mods> math library-like utility modules')
     print('\twith an average of <avg_num_u_functions> functions')
@@ -428,7 +427,6 @@ def parse_and_run(executable):
         call_depth = 10
         extern = False
         seed = False
-        timing = False
         seedval = -1
         next = 0
         fun_print = False
@@ -455,8 +453,6 @@ def parse_and_run(executable):
                     next = 2
                 elif sys.argv[i] == '-p':    
                     fun_print = True
-                elif sys.argv[i] == '-t':
-                    timing = True
                 elif sys.argv[i] == '-n':
                     name_length = int(sys.argv[i + 1])
                     next = 1
@@ -496,7 +492,7 @@ def parse_and_run(executable):
         print('#############################')
         print_usage(executable)
     
-    run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, timing, name_length, include_dir, CC)
+    run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC)
 
     return configure_args, python_command
     
