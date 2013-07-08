@@ -145,12 +145,12 @@
     message about its own static properties. 
 
     ************************************************
-    Size of aggregate total of shared libraries: 1.4GB
-    Size of aggregate texts of shared libraries: 491.0MB
-    Size of aggregate data of shared libraries: 12.9MB
-    Size of aggregate debug sections of shared libraries: 710.0MB
-    Size of aggregate symbol tables of shared libraries: 35.7MB
-    Size of aggregate string table size of shared libraries: 172.0MB
+    Size of aggregate total of shared libraries: 2.1GB
+    Size of aggregate texts of shared libraries: 694.6MB
+    Size of aggregate data of shared libraries: 18.1MB
+    Size of aggregate debug sections of shared libraries: 1.1GB
+    Size of aggregate symbol tables of shared libraries: 45.6MB
+    Size of aggregate string table size of shared libraries: 311.2MB
     ************************************************
  
     When more details on static properties for individual 
