@@ -284,7 +284,8 @@ if myRank == 0:
     fractal_file = open('./examples/fractal.py', 'r')
     lines = fractal_file.readlines()
     for line in lines[1:]:
-        f.write(line)
+        if line.find('message') == -1: #suppress each task printing
+            f.write(line)
 
     text = """mpi.barrier()
 if myRank == 0:

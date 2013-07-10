@@ -158,11 +158,13 @@
     "sharedlib_section_info"
 
   3.1 TO TEST
-    % python pynamic_driver.py
+    % python pynamic_driver.py `date +%s`
     
       or in a batchxterm:
     
-    % srun pynamic-pyMPI pynamic_driver.py
+    % srun pynamic-pyMPI pynamic_driver.py `date +%s`
+    
+    % srun pynamic-bigexe pynamic_driver.py `date +%s`
 
     # note: Pynamic creates 3 executables:
     #    pyMPI - a vanilla pyMPI build
