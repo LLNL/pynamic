@@ -195,7 +195,10 @@ def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
     filename = file_prefix + '.c'
     cwd = os.getcwd()
     outfile = file_prefix + '.so'
-    command = '%s -g -fPIC -shared' %(CC)
+    if (CC.find('xl')) != -1:
+        command = '%s -g -qmkshrobj' %(CC)
+    else:
+        command = '%s -g -fPIC -shared' %(CC)
     if file_prefix.find('module') != -1:
         command += ' -I%s' %(include_dir)
         command += ' -Wl,-rpath=' + cwd + ' -L' + cwd
@@ -521,8 +524,8 @@ def parse_and_run(executable):
                     configure_args.append(sys.argv[i])
                     python_command = sys.argv[i][14:]
                 else:
-                    print_usage(executable)
                     print_error('Unknown option %s' %(sys.argv[i]))
+                    print_usage(executable)
             else:
                 next = next - 1
 
@@ -536,7 +539,10 @@ def parse_and_run(executable):
             output = Popen([python_command, "-V"], stdout = PIPE, stderr = PIPE).communicate()
             version = output[1].split()[1][0:3]
             include_dir = '%s/include/python%s' %(base_dir, version)
-    except:
+    except Exception as e:
+        import traceback
+        print(repr(e))
+        traceback.print_exc()
         if exit == 1:
             # handle caught exit
             sys.exit(-1)
