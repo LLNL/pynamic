@@ -11,15 +11,10 @@
 #          codes, builds shared libraries using those codes, and then
 #          configures/builds pyMPI with those libraries.
 #
-# To change the parameters used in producing dummy libraries--parameters
-# controlling the number of shared libraries, average library and
-# symbol table size, and etc--change the value of "num_files"
-# and/or "num_fuctions" in this file.
 
-from so_generator import *
-from subprocess import *
-import sys, os
-import os.path
+from so_generator import print_error, parse_and_run, run_command
+import sys
+import os
 
 #
 # run the so_generator
@@ -32,10 +27,7 @@ configure_args, python_command, bigexe = parse_and_run('config_pynamic.py')
 #
 # configure pyMPI with the pynamic-generated libraries
 #
-cwd = os.getcwd()
-command = ''
-command += './configure --with-prompt-nl --with-isatty '
-command += '--with-libs="'
+command = './configure --with-prompt-nl --with-isatty --with-libs="'
 for p, d, f in os.walk('./'):
     for file in f:
         if file.find('.so') != -1 and file.find('lib') != -1:
@@ -43,83 +35,52 @@ for p, d, f in os.walk('./'):
 command += '" '
 for arg in configure_args:
     command += arg + ' '
-print(command)
-ret = os.system(command)
+ret = run_command(command, False)
 if ret != 0:
-    print_error('configure returned an error! Please specify/fix configure args with the -c option')
+    print('configure returned an error! Please specify/fix configure args with the -c option')
+    sys.exit(ret)
 
 #
 # run the pyMPI Makefile
 #
 command = 'make clean'
-print(command)
-ret = os.system(command)
-if ret != 0:
-    print_error('make clean failed!')
+run_command(command)
+
 command = 'make'
-print(command)
-ret = os.system(command)
-if ret != 0:
-    print_error('make failed!')
+run_command(command)
 
 if bigexe == False:
     command = 'rm -f pynamic-bigexe'
-    print(command)
-    ret = os.system(command)
-    if ret != 0:
-        print_error('%s failed!' %(command))
+    run_command(command, False)
 
 #
 # build the addall utility program
 #
 if os.path.exists('./addall.c') != True:
     print_error('required file addall.c not found!')
+    sys.exit(0)
 
 command = "gcc -g addall.c -o addall"
-print(command)
-ret = os.system(command)
-if ret != 0:
-    print_error('Failed to build addall utility!')
+run_command(command)
 
 #
 # check DBG, text, symbol table, and string table size.
 #
 if os.path.exists('./get-symtab-sizes') != True:
     print_error('required file get-symtab-sizes not found!')
+    sys.exit(0)
 
-else:
-    os.system('rm -f sharedlib_section_info')
-    if os.path.exists('pynamic-pyMPI'):
-        command = "./get-symtab-sizes pynamic-pyMPI > sharedlib_section_info"
-        print(command)
-        ret = os.system(command)
+for exe in ['pynamic-pyMPI', 'pynamic-sdb-pyMPI', 'pynamic-bigexe']:
+    info_file = 'sharedlib_section_info_%s' %(exe)
+    os.system('rm -f %s' %(info_file))
+    if os.path.exists(exe):
+        command = "./get-symtab-sizes %s > %s" %(exe, info_file)
+        ret = run_command(command)
         if ret != 0:
-            print_error('Failed to get executable statistics!')
+            print_error('Failed to get executable statistics for %s!' %(exe))
         else:
-            command = "tail -10 sharedlib_section_info"
-            os.system(command)
-
-    os.system('rm -f sharedlib_section_info2')
-    if os.path.exists('pynamic-sdb-pyMPI'):
-        command = "./get-symtab-sizes pynamic-sdb-pyMPI > sharedlib_section_info2"
-        print(command)
-        ret = os.system(command)
-        if ret != 0:
-            print_error('Failed to get executable statistics!')
-        else:
-            command = "tail -10 sharedlib_section_info2"
-            os.system(command)
-
-    os.system('rm -f sharedlib_section_info3')
-    if os.path.exists('pynamic-bigexe'):
-        command = "./get-symtab-sizes pynamic-bigexe > sharedlib_section_info3"
-        print(command)
-        ret = os.system(command)
-        if ret != 0:
-            print_error('Failed to get executable statistics!')
-        else:
-            command = "tail -10 sharedlib_section_info3"
-            os.system(command)
+            command = "tail -10 %s" %(info_file)
+            run_command(command)
 
 #
 #COPYRIGHT

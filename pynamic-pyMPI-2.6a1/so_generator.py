@@ -13,6 +13,13 @@ from subprocess import *
 
 var_types = ['int', 'long', 'float', 'double', 'char *']
 
+def run_command(command, exit_on_error=True):
+    print(command)
+    ret = os.system(command)
+    if ret != 0:
+        print_error('%s failed!' %(command), exit_on_error)
+    return ret
+
 #write a function declaration to a file
 def write_function_declaration(f, function_name, function):
     function_type = function[0]
@@ -208,26 +215,17 @@ def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
             command += ' -lutility' + str(i)
 
     command += ' -o ' + outfile + ' ' + filename
-    print(command)
-    ret = os.system(command)
-    if ret != 0:
-        print_error('Failed to compile shared object!  You may need to specify/fix the Python include directory with the -i option')
+    run_command(command)
 
     # create .o file
     outfile = file_prefix + '.o'
     command = '%s -g -fPIC -c' %(CC)
     command += ' -o ' + outfile + ' ' + filename
     command += ' -I%s' %(include_dir)
-    print(command)
-    ret = os.system(command)
-    if ret != 0:
-        print_error('Failed to compile shared object!  You may need to specify/fix the Python include directory with the -i option')
+    run_command(command)
 
     command = 'ar cru libpynamic.a %s' %(outfile)
-    print(command)
-    ret = os.system(command)
-    if ret != 0:
-        print_error('%s failed!' %(command))
+    run_command(command)
 
 #create a python driver file
 def create_driver(num_files, filename, mpi_wrapper_text):
@@ -349,10 +347,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
     utility_enabled = False
 
     command = 'rm -f libpynamic.a'
-    print(command)
-    ret = os.system(command)
-    if ret != 0:
-        print_error('%s failed!' %(command))
+    run_command(command)
 
     pynamic_header_name = 'pynamic.h'
     pynamic_header_file = open(pynamic_header_name, 'w')
@@ -382,10 +377,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         compile_file(file_prefix, i, num_utility_files, include_dir, CC)
 
     command = 'ranlib libpynamic.a'
-    print(command)
-    ret = os.system(command)
-    if ret != 0:
-        print_error('%s failed!' %(command))
+    run_command(command)
 
     f = open("pyMPI_initialize.c", "r")
     lines = f.readlines()
@@ -459,11 +451,12 @@ def print_usage(executable):
     print('\talso be passed to the pyMPI configure script.\n')
     sys.exit(-1)
 
-def print_error(error_msg):
+def print_error(error_msg, exit_on_error=True):
     print('\n************************* ERROR *************************')
     print(error_msg)
     print('*********************************************************\n')
-    sys.exit(-1)
+    if exit_on_error == True:
+        sys.exit(-1)
 
 def parse_and_run(executable):
     #parse and extract command line args
