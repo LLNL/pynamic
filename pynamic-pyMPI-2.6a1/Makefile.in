@@ -111,7 +111,26 @@ am_libpyMPI_a_OBJECTS = pyMPI_banner.$(OBJEXT) pyMPI_cart.$(OBJEXT) \
 	pyMPI_user_banner.$(OBJEXT) pyMPI_user_directory.$(OBJEXT) \
 	pyMPI_user_fini.$(OBJEXT) pyMPI_user_init.$(OBJEXT) \
 	pyMPI_user_startup.$(OBJEXT) pyMPI_util.$(OBJEXT)
+am_libpynamic_sdb_pyMPI_a_OBJECTS = pyMPI_banner.$(OBJEXT) pyMPI_cart.$(OBJEXT) \
+	pyMPI_configuration.$(OBJEXT) pyMPI_comm.$(OBJEXT) \
+	pyMPI_comm_asynchronous.$(OBJEXT) \
+	pyMPI_comm_collective.$(OBJEXT) pyMPI_comm_io.$(OBJEXT) \
+	pyMPI_comm_map.$(OBJEXT) pyMPI_comm_message.$(OBJEXT) \
+	pyMPI_comm_misc.$(OBJEXT) pyMPI_distutils.$(OBJEXT) \
+	pyMPI_file.$(OBJEXT) pyMPI_init.$(OBJEXT) \
+	pynamic_sdb_pyMPI_initialize.$(OBJEXT) pyMPI_isatty.$(OBJEXT) \
+	pyMPI_main.$(OBJEXT) pyMPI_pickle.$(OBJEXT) \
+	pyMPI_pipes.$(OBJEXT) pyMPI_rco.$(OBJEXT) \
+	pyMPI_readline.$(OBJEXT) pyMPI_recv.$(OBJEXT) \
+	pyMPI_reductions.$(OBJEXT) pyMPI_request.$(OBJEXT) \
+	pyMPI_signals.$(OBJEXT) pyMPI_site.$(OBJEXT) \
+	pyMPI_send.$(OBJEXT) pyMPI_shared_file.$(OBJEXT) \
+	pyMPI_status.$(OBJEXT) pyMPI_sysmods.$(OBJEXT) \
+	pyMPI_user_banner.$(OBJEXT) pyMPI_user_directory.$(OBJEXT) \
+	pyMPI_user_fini.$(OBJEXT) pyMPI_user_init.$(OBJEXT) \
+	pyMPI_user_startup.$(OBJEXT) pyMPI_util.$(OBJEXT)
 libpyMPI_a_OBJECTS = $(am_libpyMPI_a_OBJECTS)
+libpynamic_sdb_pyMPI_a_OBJECTS = $(am_libpynamic_sdb_pyMPI_a_OBJECTS)
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
 am_pyMPI_OBJECTS = pyMPI.$(OBJEXT)
@@ -130,7 +149,7 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) 
 SOURCES = $(libpyMPI_a_SOURCES) $(pyMPI_SOURCES) \
-	$(pyMPI_linker_SOURCES)
+	$(pyMPI_linker_SOURCES) pynamic_sdb_pyMPI_initialize.c
 DIST_SOURCES = $(libpyMPI_a_SOURCES) $(pyMPI_SOURCES) \
 	$(pyMPI_linker_SOURCES)
 dataDATA_INSTALL = $(INSTALL_DATA)
@@ -294,6 +313,7 @@ pyMPI_SOURCES = \
     pyMPI.c
 
 pyMPI_LDADD = -L. libpyMPI.a @AIX_PYMPI_EXP_FLAG@ @LDFLAGS@
+pynamic_sdb_pyMPI_LDADD = -L. libpynamic-sdb-pyMPI.a libpynamic.a @AIX_PYMPI_EXP_FLAG@ @LDFLAGS@
 libpyMPI_a_SOURCES = \
     pyMPI_banner.c \
     pyMPI_cart.c \
@@ -329,7 +349,7 @@ libpyMPI_a_SOURCES = \
     pyMPI_user_fini.c \
     pyMPI_user_init.c \
     pyMPI_user_startup.c \
-    pyMPI_util.c 
+    pyMPI_util.c
 
 bin_SCRIPTS = @PACKAGE@$(version)$(EXEEXT) pyMPI$(version)_linker$(EXEEXT)
 lib_LIBRARIES = libpyMPI.a
@@ -398,6 +418,7 @@ CLEANFILES = augmentedMakefile pyMPI.exp \
 	pyMPI_configuration.c \
 	extensiontest.* \
 	pynamic-pyMPI$(EXEEXT) \
+	pynamic-sdb-pyMPI$(EXEEXT) \
 	pynamic-bigexe$(EXEEXT) \
 	pyMPI$(version)$(EXEEXT) \
 	pyMPI$(version)_linker$(EXEEXT) \
@@ -505,10 +526,13 @@ uninstall-libLIBRARIES:
 
 clean-libLIBRARIES:
 	-test -z "$(lib_LIBRARIES)" || rm -f $(lib_LIBRARIES)
-libpyMPI.a: $(libpyMPI_a_OBJECTS) $(libpyMPI_a_DEPENDENCIES) $(PYNAMIC_BIGEXE_OBJS)
+libpyMPI.a: $(libpyMPI_a_OBJECTS) $(libpyMPI_a_DEPENDENCIES) $(PYNAMIC_BIGEXE_OBJS) $(libpynamic_sdb_pyMPI_a_OBJECTS)
 	-rm -f libpyMPI.a
 	$(libpyMPI_a_AR) libpyMPI.a $(libpyMPI_a_OBJECTS) $(libpyMPI_a_LIBADD)
 	$(RANLIB) libpyMPI.a
+	-rm -f libpynamic-sdb-pyMPI.a
+	$(libpyMPI_a_AR) libpynamic-sdb-pyMPI.a $(libpynamic_sdb_pyMPI_a_OBJECTS) $(libpyMPI_a_LIBADD)
+	$(RANLIB) libpynamic-sdb-pyMPI.a
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"
@@ -539,9 +563,11 @@ clean-noinstPROGRAMS:
 pyMPI$(EXEEXT): $(pyMPI_OBJECTS) $(pyMPI_DEPENDENCIES) 
 	@rm -f pyMPI$(EXEEXT)
 	@rm -f pynamic-pyMPI$(EXEEXT)
+	@rm -f pynamic-sdb-pyMPI$(EXEEXT)
 	@rm -f pynamic-bigexe$(EXEEXT)
 	$(LINK) -o $@ $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS)
 	$(LINK) -o pynamic-pyMPI$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS) $(PYNAMICLIBS)
+	$(LINK) -o pynamic-sdb-pyMPI$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pynamic_sdb_pyMPI_LDADD) $(LIBS) 
 	$(LINK) -o pynamic-bigexe$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS) $(PYNAMICLIBS) $(PYNAMIC_BIGEXE_OBJS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)

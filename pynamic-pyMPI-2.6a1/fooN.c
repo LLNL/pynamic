@@ -1,6 +1,8 @@
 /* Allow ten differently named large functions to be created and put into a function pointer array. -JCG LLNL 1 March 2010
 */
 
+#ifdef BUILD_PYNAMIC_BIGEXE
+
  #include <stdio.h> 
 
 #ifndef INDEX 
@@ -232,3 +234,4 @@ int main()
 }
 */
 
+#endif

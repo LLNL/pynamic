@@ -2,6 +2,8 @@
 # FILE: pynamic.README
 #
 # Updates: 
+#          Apr 28 2014 GLL: Create system dynamic build (sdb) Pynamic
+#                           make pynamic-bigexe optional with -b flag
 #          Jul 08 2013 GLL: Create mpi4py driver
 #                           tag version 1.3
 #          Jul 03 2013 GLL: Create pyMPI, pynamic-pyMPI, and pynamic-bigexe

@@ -1,6 +1,5 @@
 #/bin/env python
 
-#
 # Please see COPYRIGHT information at the end of this file.
 # File: so_generator.py
 # Author: Greg Lee
@@ -43,7 +42,7 @@ def write_function_call(f, function_name, function):
             f.write('"hello"')
         if arg_num != num_args - 1:
             f.write(', ')
-    f.write(');\n')    
+    f.write(');\n')
 
 # create a .c file for use within Python
 def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, utility_enabled, fun_print, name_length):
@@ -65,11 +64,11 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
         #declare external function to call if not first module
         if my_id != 0 and extern:
             f.write('extern ')
-            function_name = file_prefix_in + str(my_id - 1) + '_extern' 
+            function_name = file_prefix_in + str(my_id - 1) + '_extern'
             function = extern_list[my_id - 1]
             write_function_declaration(f, function_name, function)
             f.write(';\n')
-    
+
         #define my external function
         if extern:
             function_name = file_prefix + '_extern'
@@ -96,7 +95,7 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
             function = functions[i]
             write_function_declaration(f, function_name, function)
             f.write(';\n')
-        f.write('\n')    
+        f.write('\n')
     else:
         utility_header_name = file_prefix + '.h'
         utility_header_file = open(utility_header_name, 'w')
@@ -108,9 +107,9 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
             function = functions[i]
             write_function_declaration(utility_header_file, function_name, function)
             utility_header_file.write(';\n')
-        utility_header_file.write('\n')    
-        utility_header_file.close()    
-        
+        utility_header_file.write('\n')
+        utility_header_file.close()
+
     for i in range(num_functions):
         #function declaration
         function_name = file_prefix + '_fun' + str(i)
@@ -120,14 +119,14 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
         write_function_declaration(f, function_name, function)
         function_type = function[0]
         f.write('\n{\n')
-            
+
         #variable declarations
         f.write('\t' + function_type + ' ret_val;\n')
         f.write('\tint a, b, c, loop;\n')
         f.write('\tfloat d = 0.0, e = 1.0, f = 2.0;\n')
         f.write('\tdouble g = 0.0, h = 3.0, i = 4.0;\n')
         f.write('\tchar j[10], k[100], l[10][10];\n\n')
-        
+
         #function body
         if fun_print:
             f.write('\tprintf("In module ' + file_prefix + ' function ' + function_name + '\\n");\n')
@@ -144,7 +143,7 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
                 callee_name += str(j%10)
             f.write('\t')
             write_function_call(f, callee_name, callee)
-            
+
         f.write('\t}\n')
 
         #call the next function if not the last function, and not
@@ -155,7 +154,7 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
             for j in range(name_length):
                 callee_name += str(j%10)
             write_function_call(f, callee_name, callee)
-        
+
         f.write('\treturn ret_val;\n}\n\n')
 
     if file_prefix_in == 'libmodule':
@@ -171,25 +170,25 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
                 for j in range(name_length):
                     callee_name += str(j%10)
                 write_function_call(f, callee_name, callee)
-                
+
         #call the previous module's extern function
         if my_id != 0 and extern:
             callee = extern_list[my_id - 1]
             callee_name = file_prefix_in + str(my_id - 1) + '_extern'
             write_function_call(f, callee_name, callee)
-    
+
         f.write('\treturn Py_BuildValue("i", ret_val);\n}\n\n')
-    
+
         #Python module initialization code
         f.write('static PyMethodDef ' + file_prefix + 'Methods[] = {\n')
-        f.write('\t{"' + function_name + '", py_' + function_name + ', METH_VARARGS, "a function."},\n')    
-        f.write('\t{NULL, NULL, 0, NULL}\n')    
-        f.write('};\n\n')    
-        f.write('void init' + file_prefix + '()\n')    
-        f.write('{\n')    
-        f.write('\tPy_InitModule("' + file_prefix + '", ' + file_prefix + 'Methods);\n')    
-        f.write('}\n\n')    
-    f.close()    
+        f.write('\t{"' + function_name + '", py_' + function_name + ', METH_VARARGS, "a function."},\n')
+        f.write('\t{NULL, NULL, 0, NULL}\n')
+        f.write('};\n\n')
+        f.write('void init' + file_prefix + '()\n')
+        f.write('{\n')
+        f.write('\tPy_InitModule("' + file_prefix + '", ' + file_prefix + 'Methods);\n')
+        f.write('}\n\n')
+    f.close()
 
 # compile a .c file into a Python-usable .so file
 def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
@@ -201,15 +200,31 @@ def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
         command += ' -I%s' %(include_dir)
         command += ' -Wl,-rpath=' + cwd + ' -L' + cwd
         if i != 0:
-            command += ' -lmodule' + str(i-1) 
+            command += ' -lmodule' + str(i-1)
         for i in range(num_utility_files):
             command += ' -lutility' + str(i)
-        
+
     command += ' -o ' + outfile + ' ' + filename
     print(command)
     ret = os.system(command)
     if ret != 0:
         print_error('Failed to compile shared object!  You may need to specify/fix the Python include directory with the -i option')
+
+    # create .o file
+    outfile = file_prefix + '.o'
+    command = '%s -g -fPIC -c' %(CC)
+    command += ' -o ' + outfile + ' ' + filename
+    command += ' -I%s' %(include_dir)
+    print(command)
+    ret = os.system(command)
+    if ret != 0:
+        print_error('Failed to compile shared object!  You may need to specify/fix the Python include directory with the -i option')
+
+    command = 'ar cru libpynamic.a %s' %(outfile)
+    print(command)
+    ret = os.system(command)
+    if ret != 0:
+        print_error('%s failed!' %(command))
 
 #create a python driver file
 def create_driver(num_files, filename, mpi_wrapper_text):
@@ -232,7 +247,7 @@ except:
             pass
     mpi = dummy_mpi()
     mpi_avail = False
-            
+
 mpi.barrier()
 myRank = mpi.rank
 nProcs = mpi.procs
@@ -252,7 +267,7 @@ if myRank == 0:
         f.write('import libmodule' + str(i) + '\n')
 
     text = """mpi.barrier()
-if myRank == 0:    
+if myRank == 0:
     import_end = time.time()
     import_time = import_end - import_start
     print('Pynamic: driver finished importing all modules... visiting all module functions')
@@ -295,7 +310,7 @@ if myRank == 0:
 """
     f.write(text)
 
-    f.close()    
+    f.close()
 
 #create a function list    (type + args quantity and types)
 def create_function_list(num_functions):
@@ -310,8 +325,8 @@ def create_function_list(num_functions):
             type = var_types[random.randint(0, len(var_types) - 1)]
             function.append(type)
         functions.append(function)
-    return functions    
-    
+    return functions
+
 #the main driver
 def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC):
 
@@ -324,20 +339,26 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
     if extern:
         global extern_list
         extern_list = create_function_list(num_files)
-    
-    if seed == True:    
+
+    if seed == True:
         random.seed(seedval)
 
-    utility_enabled = False    
-    
+    utility_enabled = False
+
+    command = 'rm -f libpynamic.a'
+    print(command)
+    ret = os.system(command)
+    if ret != 0:
+        print_error('%s failed!' %(command))
+
+    pynamic_header_name = 'pynamic.h'
+    pynamic_header_file = open(pynamic_header_name, 'w')
+    pynamic_header_file.write('#include <math.h>\n')
     if num_utility_files > 0:
         global utility_list
         utility_list = []
         utility_enabled = True
-        
-        pynamic_header_name = 'pynamic.h'
-        pynamic_header_file = open(pynamic_header_name, 'w')
-        pynamic_header_file.write('#include <math.h>\n')
+
         for i in range(num_utility_files):
             num_functions = random.randint(avg_num_u_functions/2, avg_num_u_functions*3/2)
             file_prefix = 'libutility'
@@ -345,16 +366,39 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
             generate_c_file(file_prefix, i, num_functions, call_depth, extern, utility_enabled, fun_print, name_length)
             file_prefix += str(i)
             compile_file(file_prefix, i, num_utility_files, include_dir, CC)
-        pynamic_header_file.close()    
-    
+
+    for i in range(num_files - num_utility_files):
+        pynamic_header_file.write('void initlibmodule%d();\n' %(i))
+    pynamic_header_file.close()
+
     for i in range(num_files - num_utility_files):
         num_functions = random.randint(avg_num_functions/2, avg_num_functions*3/2)
-        file_prefix = 'libmodule'  
+        file_prefix = 'libmodule'
         generate_c_file(file_prefix, i, num_functions, call_depth, extern, utility_enabled, fun_print, name_length)
         file_prefix += str(i)
         compile_file(file_prefix, i, num_utility_files, include_dir, CC)
 
+    command = 'ranlib libpynamic.a'
+    print(command)
+    ret = os.system(command)
+    if ret != 0:
+        print_error('%s failed!' %(command))
+
+    f = open("pyMPI_initialize.c", "r")
+    lines = f.readlines()
+    f.close()
+    f = open("pynamic_sdb_pyMPI_initialize.c", "w")
+    for line in lines:
+        f.write(line)
+        if line.find('pyMPI_Macros.h') != -1:
+            f.write('#include "pynamic.h"\n')
+        if line.find('PyImport_AppendInittab') != -1:
+            for i in range(num_files - num_utility_files):
+                f.write('  PyImport_AppendInittab("libmodule%d",initlibmodule%d);\n' %(i, i))
+    f.close()
+
     print('Generating driver...')
+
     mpi_wrapper_text = """    import mpi as actual_mpi
     class mpi_wrapper:
         def __init__(self):
@@ -381,7 +425,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
     create_driver(num_files - num_utility_files, "pynamic_driver_mpi4py.py", mpi_wrapper_text)
     print('Done!\n')
 
-def print_usage(executable):    
+def print_usage(executable):
     config_options = ''
     if executable == 'config_pynamic.py':
         config_options = '[-c <configure_options>]'
@@ -394,6 +438,7 @@ def print_usage(executable):
         print('\tpass the whitespace separated list of <configure_options> to configure')
         print('\twhen building pyMPI.  All args after -c are sent to configure and not ')
         print('\tinterpreted by Pynamic\n')
+    print('-b\n\tgenerate the pynamic-bigexe executable\n')
     print('-d <call_depth>\n\tmaximum Pynamic call stack depth, default = 10\n')
     print('-e\n\tenables external functions to call across modules\n')
     print('-i <python_include_dir>\n\tadd <python_include_dir> when compiling modules\n')
@@ -426,6 +471,7 @@ def parse_and_run(executable):
         num_utility_files = 0
         avg_num_u_functions = 0
         call_depth = 10
+        bigexe = False
         extern = False
         seed = False
         seedval = -1
@@ -436,10 +482,16 @@ def parse_and_run(executable):
         configure_args = []
         python_command = 'python'
         CC = 'gcc'
-        
+
         for i in range(3, len(sys.argv)):
             if next == 0:
-                if sys.argv[i] == '-e':
+                if sys.argv[i] == '-b':
+                    bigexe = True
+                    try:
+                        os.environ['CFLAGS'] += ' -DBUILD_PYNAMIC_BIGEXE'
+                    except:
+                        os.environ['CFLAGS'] = '-DBUILD_PYNAMIC_BIGEXE'
+                elif sys.argv[i] == '-e':
                     extern = True
                 elif sys.argv[i] == '-d':
                     call_depth = int(sys.argv[i + 1])
@@ -452,7 +504,7 @@ def parse_and_run(executable):
                     num_utility_files = int(sys.argv[i + 1])
                     avg_num_u_functions = int(sys.argv[i + 2])
                     next = 2
-                elif sys.argv[i] == '-p':    
+                elif sys.argv[i] == '-p':
                     fun_print = True
                 elif sys.argv[i] == '-n':
                     name_length = int(sys.argv[i + 1])
@@ -460,7 +512,7 @@ def parse_and_run(executable):
                 elif sys.argv[i] == '-i':
                     include_dir = sys.argv[i + 1]
                     next = 1
-                elif sys.argv[i] == '-c':    
+                elif sys.argv[i] == '-c':
                     configure_args += sys.argv[i+1:]
                     next = 99999
                 elif sys.argv[i].find('--with-cc=') != -1:
@@ -473,7 +525,7 @@ def parse_and_run(executable):
                     print_error('Unknown option %s' %(sys.argv[i]))
             else:
                 next = next - 1
-    
+
         if include_dir == '':
             # try to automatically find include directory for default python
             output = Popen([python_command, "-c",  "import sys; sys.stdout.write(sys.prefix)"], stdout = PIPE, stderr = PIPE).communicate()
@@ -492,32 +544,32 @@ def parse_and_run(executable):
         print('# invalid arguments passed! #')
         print('#############################')
         print_usage(executable)
-    
+
     run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC)
 
-    return configure_args, python_command
-    
+    return configure_args, python_command, bigexe
+
 #MAIN FUNCTION
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         print_usage('python so_generator.py')
-    parse_and_run('python so_generator.py')    
+    parse_and_run('python so_generator.py')
 
 #
 #COPYRIGHT
 #
-#Copyright (c) 2007, The Regents of the University of California. 
-#Produced at the Lawrence Livermore National Laboratory 
-#Written by Gregory Lee, Dong Ahn, John Gyllenhaal, Bronis de Supinski. 
-#UCRL-CODE-228991. 
-#All rights reserved. 
-# 
-#This file is part of Pynamic.   For details contact Greg Lee (lee218@llnl.gov).  Please also read the "ADDITIONAL BSD NOTICE" in pynamic.LICENSE. 
-# 
-#Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met: 
-# 
-#* Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer below.  
-#* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer (as noted below) in the documentation and/or other materials provided with the distribution.  
-#* Neither the name of the UC/LLNL nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission. 
+#Copyright (c) 2007, The Regents of the University of California.
+#Produced at the Lawrence Livermore National Laboratory
+#Written by Gregory Lee, Dong Ahn, John Gyllenhaal, Bronis de Supinski.
+#UCRL-CODE-228991.
+#All rights reserved.
 #
-#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OF THE UNIVERSITY OF CALIFORNIA, THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+#This file is part of Pynamic.   For details contact Greg Lee (lee218@llnl.gov).  Please also read the "ADDITIONAL BSD NOTICE" in pynamic.LICENSE.
+#
+#Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+#
+#* Redistributions of source code must retain the above copyright notice, this list of conditions and the disclaimer below.
+#* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the disclaimer (as noted below) in the documentation and/or other materials provided with the distribution.
+#* Neither the name of the UC/LLNL nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OF THE UNIVERSITY OF CALIFORNIA, THE U.S. DEPARTMENT OF ENERGY OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON  ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
