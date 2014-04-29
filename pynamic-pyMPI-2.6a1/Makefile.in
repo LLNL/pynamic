@@ -92,7 +92,7 @@ PYNAMIC_BIGEXE_OBJS = foo0.$(OBJEXT) \
         foo6.$(OBJEXT) \
         foo7.$(OBJEXT) \
         foo8.$(OBJEXT) \
-        foo9.$(OBJEXT) 
+        foo9.$(OBJEXT)
 am_libpyMPI_a_OBJECTS = pyMPI_banner.$(OBJEXT) pyMPI_cart.$(OBJEXT) \
 	pyMPI_configuration.$(OBJEXT) pyMPI_comm.$(OBJEXT) \
 	pyMPI_comm_asynchronous.$(OBJEXT) \
@@ -147,7 +147,7 @@ am__depfiles_maybe =
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
-LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) 
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS)
 SOURCES = $(libpyMPI_a_SOURCES) $(pyMPI_SOURCES) \
 	$(pyMPI_linker_SOURCES) pynamic_sdb_pyMPI_initialize.c
 DIST_SOURCES = $(libpyMPI_a_SOURCES) $(pyMPI_SOURCES) \
@@ -419,13 +419,14 @@ CLEANFILES = augmentedMakefile pyMPI.exp \
 	extensiontest.* \
 	pynamic-pyMPI$(EXEEXT) \
 	pynamic-sdb-pyMPI$(EXEEXT) \
-	pynamic-bigexe$(EXEEXT) \
+	pynamic-bigexe-pyMPI$(EXEEXT) \
+	pynamic-bigexe-sdb-pyMPI$(EXEEXT) \
 	pyMPI$(version)$(EXEEXT) \
 	pyMPI$(version)_linker$(EXEEXT) \
 	pyMPI_linker$(EXEEXT) \
 	debug \
 	pyMPI_Externals.h \
-	pyMPI.exp 
+	pyMPI.exp
 
 
 #-----------------------------------------------
@@ -484,7 +485,7 @@ pyMPI_Config.h: stamp-h1
 stamp-h1: $(srcdir)/pyMPI_Config.h.in $(top_builddir)/config.status
 	@rm -f stamp-h1
 	cd $(top_builddir) && $(SHELL) ./config.status pyMPI_Config.h
-$(srcdir)/pyMPI_Config.h.in:  $(am__configure_deps) 
+$(srcdir)/pyMPI_Config.h.in:  $(am__configure_deps)
 	cd $(top_srcdir) && $(AUTOHEADER)
 	rm -f stamp-h1
 	touch $@
@@ -560,15 +561,17 @@ clean-binPROGRAMS:
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-pyMPI$(EXEEXT): $(pyMPI_OBJECTS) $(pyMPI_DEPENDENCIES) 
+pyMPI$(EXEEXT): $(pyMPI_OBJECTS) $(pyMPI_DEPENDENCIES)
 	@rm -f pyMPI$(EXEEXT)
 	@rm -f pynamic-pyMPI$(EXEEXT)
 	@rm -f pynamic-sdb-pyMPI$(EXEEXT)
-	@rm -f pynamic-bigexe$(EXEEXT)
+	@rm -f pynamic-bigexe-pyMPI$(EXEEXT)
+	@rm -f pynamic-bigexe-sdb-pyMPI$(EXEEXT)
 	$(LINK) -o $@ $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS)
 	$(LINK) -o pynamic-pyMPI$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS) $(PYNAMICLIBS)
-	$(LINK) -o pynamic-sdb-pyMPI$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pynamic_sdb_pyMPI_LDADD) $(LIBS) 
-	$(LINK) -o pynamic-bigexe$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS) $(PYNAMICLIBS) $(PYNAMIC_BIGEXE_OBJS)
+	$(LINK) -o pynamic-sdb-pyMPI$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pynamic_sdb_pyMPI_LDADD) $(LIBS)
+	$(LINK) -o pynamic-bigexe-pyMPI$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pyMPI_LDADD) $(LIBS) $(PYNAMICLIBS) $(PYNAMIC_BIGEXE_OBJS)
+	$(LINK) -o pynamic-bigexe-sdb-pyMPI$(EXEEXT) $(pyMPI_LDFLAGS) $(pyMPI_OBJECTS) $(pynamic_sdb_pyMPI_LDADD) $(LIBS) $(PYNAMIC_BIGEXE_OBJS)
 install-binSCRIPTS: $(bin_SCRIPTS)
 	@$(NORMAL_INSTALL)
 	test -z "$(bindir)" || $(mkdir_p) "$(DESTDIR)$(bindir)"

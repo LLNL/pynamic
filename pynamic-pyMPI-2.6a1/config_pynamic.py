@@ -12,7 +12,7 @@
 #          configures/builds pyMPI with those libraries.
 #
 
-from so_generator import print_error, parse_and_run, run_command
+from so_generator import print_error, parse_and_run, run_command, print_usage
 import sys
 import os
 
@@ -70,7 +70,7 @@ if os.path.exists('./get-symtab-sizes') != True:
     print_error('required file get-symtab-sizes not found!')
     sys.exit(0)
 
-for exe in ['pynamic-pyMPI', 'pynamic-sdb-pyMPI', 'pynamic-bigexe']:
+for exe in ['pynamic-pyMPI', 'pynamic-sdb-pyMPI', 'pynamic-bigexe-pyMPI', 'pynamic-bigexe-sdb-pyMPI']:
     info_file = 'sharedlib_section_info_%s' %(exe)
     os.system('rm -f %s' %(info_file))
     if os.path.exists(exe):

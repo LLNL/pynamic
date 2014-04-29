@@ -433,7 +433,7 @@ def print_usage(executable):
         print('\tpass the whitespace separated list of <configure_options> to configure')
         print('\twhen building pyMPI.  All args after -c are sent to configure and not ')
         print('\tinterpreted by Pynamic\n')
-    print('-b\n\tgenerate the pynamic-bigexe executable\n')
+    print('-b\n\tgenerate the pynamic-bigexe-pyMPI and pynamic-bigexe-sdb-pyMPI executables\n')
     print('-d <call_depth>\n\tmaximum Pynamic call stack depth, default = 10\n')
     print('-e\n\tenables external functions to call across modules\n')
     print('-i <python_include_dir>\n\tadd <python_include_dir> when compiling modules\n')

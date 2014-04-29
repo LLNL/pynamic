@@ -3,9 +3,9 @@
 
 #ifdef BUILD_PYNAMIC_BIGEXE
 
- #include <stdio.h> 
+ #include <stdio.h>
 
-#ifndef INDEX 
+#ifndef INDEX
 #define INDEX 1
 #endif
 
@@ -30,11 +30,11 @@
 #define array_name an2(N0)
 
 #define a   i=0; i=0; i=0; i=0; i=0; i=0; i=0; i=0; i=0; i=0;
-#define b   a  a a a a a a a a a 
-#define c   b  b b b b b b b b b 
-#define d   c c c c c c c c c c 
-#define e   d d d d d d d d d d 
-#define big_body   e e e 
+#define b   a  a a a a a a a a a
+#define c   b  b b b b b b b b b
+#define d   c c c c c c c c c c
+#define e   d d d d d d d d d d
+#define big_body   e e e
 
 typedef int (*funcPtr)();
 
