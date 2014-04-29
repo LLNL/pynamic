@@ -4,6 +4,7 @@
 # Updates:
 #          Apr 29 2014 GLL: Renamed pynamic-bigexe to pynamic-bigexe-pyMPI
 #                           create pynamic-bigexe-sdb-pyMPI
+#                           added libmodulefinal with break_here function
 #                           code cleanup
 #          Apr 28 2014 GLL: Create system dynamic build (sdb) Pynamic
 #                           make pynamic-bigexe optional with -b flag

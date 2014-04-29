@@ -266,6 +266,7 @@ if myRank == 0:
 
     for i in range(num_files):
         f.write('import libmodule' + str(i) + '\n')
+    f.write('import libmodulefinal\n')
 
     text = """mpi.barrier()
 if myRank == 0:
@@ -279,6 +280,7 @@ if myRank == 0:
 
     for i in range(num_files):
         f.write('libmodule' + str(i) + '.libmodule' + str(i) + '_entry()\n')
+    f.write('libmodulefinal.break_here()\n')
 
     text = """mpi.barrier()
 if myRank == 0:
@@ -334,7 +336,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
     for p,d,f in os.walk('./'):
         if p == './':
             for file in f:
-                if file.find('libmodule') != -1 or file.find('libutility') != -1 or file.find('pynamic.h') != -1:
+                if (file.find('libmodule') != -1 or file.find('libutility') != -1 or file.find('pynamic.h') != -1) and file.find('libmodulefinal.c') == -1:
                     os.remove(file)
 
     if extern:
@@ -365,8 +367,11 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
             file_prefix += str(i)
             compile_file(file_prefix, i, num_utility_files, include_dir, CC)
 
+    compile_file("libmodulefinal", 0, 0, include_dir, CC)
+
     for i in range(num_files - num_utility_files):
         pynamic_header_file.write('void initlibmodule%d();\n' %(i))
+    pynamic_header_file.write('void initlibmodulefinal();\n')
     pynamic_header_file.close()
 
     for i in range(num_files - num_utility_files):
@@ -389,7 +394,8 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
             f.write('#include "pynamic.h"\n')
         if line.find('PyImport_AppendInittab') != -1:
             for i in range(num_files - num_utility_files):
-                f.write('  PyImport_AppendInittab("libmodule%d",initlibmodule%d);\n' %(i, i))
+                f.write('  PyImport_AppendInittab("libmodule%d", initlibmodule%d);\n' %(i, i))
+            f.write('  PyImport_AppendInittab("libmodulefinal", initlibmodulefinal);\n')
     f.close()
 
     print('Generating driver...')
