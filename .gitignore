@@ -24,3 +24,5 @@ lib*.c
 lib*.h
 micro_tests/
 slurm-*.out
+
+!*libmodulefinal.c
