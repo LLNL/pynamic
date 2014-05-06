@@ -50,7 +50,7 @@ command = 'make'
 run_command(command)
 
 if bigexe == False:
-    command = 'rm -f pynamic-bigexe'
+    command = 'rm -f pynamic-bigexe-pyMPI pynamic-bigexe-sdb-pyMPI'
     run_command(command, False)
 
 #
