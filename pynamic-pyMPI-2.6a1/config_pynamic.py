@@ -28,6 +28,7 @@ configure_args, python_command, bigexe = parse_and_run('config_pynamic.py')
 # configure pyMPI with the pynamic-generated libraries
 #
 command = './configure --with-prompt-nl --with-isatty --with-libs="'
+command += '-Wl,-rpath=%s ' %(os.getcwd())
 for p, d, f in os.walk('./'):
     for file in f:
         if file.find('.so') != -1 and file.find('lib') != -1:
