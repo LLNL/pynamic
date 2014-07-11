@@ -483,7 +483,10 @@ def parse_and_run(executable):
         include_dir = ''
         configure_args = []
         python_command = 'python'
-        CC = 'gcc'
+        try:
+            CC = os.environ['CC']
+        except:
+            CC = 'gcc'
 
         for i in range(3, len(sys.argv)):
             if next == 0:
