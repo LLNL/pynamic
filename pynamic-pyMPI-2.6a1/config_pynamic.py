@@ -1,4 +1,4 @@
-#! /bin/env python
+#! /usr/bin/env python
 
 # Please see COPYRIGHT information at the end of this file
 # File: config_pynamic.py
