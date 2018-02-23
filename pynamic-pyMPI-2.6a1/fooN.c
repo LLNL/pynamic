@@ -1,9 +1,11 @@
 /* Allow ten differently named large functions to be created and put into a function pointer array. -JCG LLNL 1 March 2010
 */
 
- #include <stdio.h> 
+#ifdef BUILD_PYNAMIC_BIGEXE
 
-#ifndef INDEX 
+ #include <stdio.h>
+
+#ifndef INDEX
 #define INDEX 1
 #endif
 
@@ -28,11 +30,11 @@
 #define array_name an2(N0)
 
 #define a   i=0; i=0; i=0; i=0; i=0; i=0; i=0; i=0; i=0; i=0;
-#define b   a  a a a a a a a a a 
-#define c   b  b b b b b b b b b 
-#define d   c c c c c c c c c c 
-#define e   d d d d d d d d d d 
-#define big_body   e e e 
+#define b   a  a a a a a a a a a
+#define c   b  b b b b b b b b b
+#define d   c c c c c c c c c c
+#define e   d d d d d d d d d d
+#define big_body   e e e
 
 typedef int (*funcPtr)();
 
@@ -232,3 +234,4 @@ int main()
 }
 */
 
+#endif
