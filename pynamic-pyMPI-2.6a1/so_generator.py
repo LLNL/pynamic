@@ -9,6 +9,7 @@
 
 import sys, os, string
 import random
+import multiprocessing as mp
 from subprocess import *
 
 var_types = ['int', 'long', 'float', 'double', 'char *']
@@ -209,8 +210,6 @@ def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
     if file_prefix.find('module') != -1:
         command += ' -I%s' %(include_dir)
         command += ' -Wl,-rpath=' + cwd + ' -L' + cwd
-        if i != 0:
-            command += ' -lmodule' + str(i-1)
         for i in range(num_utility_files):
             command += ' -lutility' + str(i)
 
@@ -222,9 +221,6 @@ def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
     command = '%s -g -fPIC -c' %(CC)
     command += ' -o ' + outfile + ' ' + filename
     command += ' -I%s' %(include_dir)
-    run_command(command)
-
-    command = 'ar cru libpynamic.a %s' %(outfile)
     run_command(command)
 
 #create a python driver file
@@ -331,7 +327,7 @@ def create_function_list(num_functions):
     return functions
 
 #the main driver
-def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC):
+def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC, processes):
 
     for p,d,f in os.walk('./'):
         if p == './':
@@ -354,32 +350,42 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
     pynamic_header_name = 'pynamic.h'
     pynamic_header_file = open(pynamic_header_name, 'w')
     pynamic_header_file.write('#include <math.h>\n')
+    pool = mp.Pool(processes=processes)
     if num_utility_files > 0:
         global utility_list
         utility_list = []
         utility_enabled = True
 
+        file_prefix = 'libutility'
         for i in range(num_utility_files):
             num_functions = random.randint(avg_num_u_functions/2, avg_num_u_functions*3/2)
-            file_prefix = 'libutility'
             pynamic_header_file.write('#include "' + file_prefix + str(i) + '.h"\n')
             generate_c_file(file_prefix, i, num_functions, call_depth, extern, utility_enabled, fun_print, name_length)
-            file_prefix += str(i)
-            compile_file(file_prefix, i, num_utility_files, include_dir, CC)
+        results = [pool.apply_async(compile_file, args=(file_prefix+str(i), i, num_utility_files, include_dir, CC)) for i in range(num_utility_files)]
+        [p.get() for p in results]
 
     compile_file("libmodulefinal", 0, 0, include_dir, CC)
+    command = 'ar cru libpynamic.a libmodulefinal.o'
+    run_command(command)
 
+    if num_utility_files > 0:
+        for i in range(num_utility_files):
+            command = 'ar cru libpynamic.a %s' %(file_prefix+str(i)+'.o')
+            run_command(command)
     for i in range(num_files - num_utility_files):
         pynamic_header_file.write('void initlibmodule%d();\n' %(i))
     pynamic_header_file.write('void initlibmodulefinal();\n')
     pynamic_header_file.close()
 
+    file_prefix = 'libmodule'
     for i in range(num_files - num_utility_files):
         num_functions = random.randint(avg_num_functions/2, avg_num_functions*3/2)
-        file_prefix = 'libmodule'
         generate_c_file(file_prefix, i, num_functions, call_depth, extern, utility_enabled, fun_print, name_length)
-        file_prefix += str(i)
-        compile_file(file_prefix, i, num_utility_files, include_dir, CC)
+    results = [pool.apply_async(compile_file, args=(file_prefix+str(i), i, num_utility_files, include_dir, CC)) for i in range(num_files - num_utility_files)]
+    [p.get() for p in results]
+    for i in range(num_files - num_utility_files):
+        command = 'ar cru libpynamic.a %s' %(file_prefix+str(i)+'.o')
+        run_command(command)
 
     command = 'ranlib libpynamic.a'
     run_command(command)
@@ -443,6 +449,7 @@ def print_usage(executable):
     print('-d <call_depth>\n\tmaximum Pynamic call stack depth, default = 10\n')
     print('-e\n\tenables external functions to call across modules\n')
     print('-i <python_include_dir>\n\tadd <python_include_dir> when compiling modules\n')
+    print('-j <num_processes>\n\tbuild in parallel with a max of <num_processes> processes\n')
     print('-n <length>\n\tadd <length> characters to the function names\n')
     print('-p\n\tadd a print statement to every generated function\n')
     print('-s <random_seed>\n\tseed to the random number generator\n')
@@ -483,6 +490,7 @@ def parse_and_run(executable):
         include_dir = ''
         configure_args = []
         python_command = 'python'
+        processes = 1
         try:
             CC = os.environ['CC']
         except:
@@ -516,6 +524,9 @@ def parse_and_run(executable):
                     next = 1
                 elif sys.argv[i] == '-i':
                     include_dir = sys.argv[i + 1]
+                    next = 1
+                elif sys.argv[i] == '-j':
+                    processes = int(sys.argv[i + 1])
                     next = 1
                 elif sys.argv[i] == '-c':
                     configure_args += sys.argv[i+1:]
@@ -553,7 +564,7 @@ def parse_and_run(executable):
         print('#############################')
         print_usage(executable)
 
-    run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC)
+    run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC, processes)
 
     return configure_args, python_command, bigexe
 
