@@ -47,7 +47,10 @@ if ret != 0:
 command = 'make clean'
 run_command(command)
 
-command = 'make'
+command = 'make dist-local'
+run_command(command)
+
+command = 'make -j 16'
 run_command(command)
 
 if bigexe == False:
