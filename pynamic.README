@@ -2,6 +2,8 @@
 # FILE: pynamic.README
 #
 # Updates:
+#          Feb 26 2018 GLL: Allow parallel builds with -j option
+#                           updated config.guess (to work for ppc64le)
 #          Apr 29 2014 GLL: Renamed pynamic-bigexe to pynamic-bigexe-pyMPI
 #                           create pynamic-bigexe-sdb-pyMPI
 #                           added libmodulefinal with break_here function
@@ -96,55 +98,61 @@
     % cd pynamic-pyMPI-2.6a1
     % config_pynamic.py
 
-    It will print out options and arguments:
+      USAGE:
+              config_pynamic.py <num_files> <avg_num_functions> [options] [-c <configure_options>]
+
+              <num_files> = total number of shared objects to produce
+              <avg_num_functions> = average number of functions per shared object
+
+      OPTIONS:
+
+      -c <configure_options>
+              pass the whitespace separated list of <configure_options> to configure
+              when building pyMPI.  All args after -c are sent to configure and not
+              interpreted by Pynamic
+
+      -b
+              generate the pynamic-bigexe-pyMPI and pynamic-bigexe-sdb-pyMPI executables
+
+      -d <call_depth>
+              maximum Pynamic call stack depth, default = 10
+
+      -e
+              enables external functions to call across modules
+
+      -i <python_include_dir>
+              add <python_include_dir> when compiling modules
+
+      -j <num_processes>
+              build in parallel with a max of <num_processes> processes
+
+      -n <length>
+              add <length> characters to the function names
+
+      -p
+              add a print statement to every generated function
+
+      -s <random_seed>
+              seed to the random number generator
+
+      -u <num_utility_mods> <avg_num_u_functions>
+              create <num_utility_mods> math library-like utility modules
+              with an average of <avg_num_u_functions> functions
+              NOTE: Number of python modules = <num_files> - <avg_num_u_functions>
+
+      --with-cc=<command>
+              use the C compiler located at <command> to build Pynamic modules.
+
+      --with-python=<command>
+              use the python located at <command> to build Pynamic modules.  Will
+              also be passed to the pyMPI configure script.
+
 
     --------------------------------------------------------
-    USAGE:
-            config_pynamic.py <num_files> <avg_num_functions> [options] [-c <configure_options>]
 
-            <num_files> = total number of shared objects to produce
-            <avg_num_functions> = average number of functions per shared object
-
-    OPTIONS:
-
-    -c <configure_options>
-            pass the whitespace separated list of <configure_options> to configure
-            when building pyMPI.  All args after -c are sent to configure and not
-            interpreted by Pynamic
-
-    -b
-            generate the pynamic-bigexe-pyMPI and pynamic-bigexe-sdb-pyMPI executables
-
-    -d <call_depth>
-            maximum Pynamic call stack depth, default = 10
-
-    -e
-            enables external functions to call across modules
-
-    -i <python_include_dir>
-            add <python_include_dir> when compiling modules
-
-    -n <length>
-            add <length> characters to the function names
-
-    -p
-            add a print statement to every generated function
-
-    -s <random_seed>
-            seed to the random number generator
-
-    -u <num_utility_mods> <avg_num_u_functions>
-            create <num_utility_mods> math library-like utility modules
-            with an average of <avg_num_u_functions> functions
-            NOTE: Number of python modules = <num_files> - <avg_num_u_functions>
-
-    --with-cc=<command>
-            use the C compiler located at <command> to build Pynamic modules.
-
-    --with-python=<command>
-            use the python located at <command> to build Pynamic modules.  Will
-            also be passed to the pyMPI configure script.
-    --------------------------------------------------------
+    Building a large number of shared objects may take a long time, in
+    which case it is advised to compiler those files in parallel using
+    the -j option, setting the value to the number of cores on the node.
 
     Options and arguments are provided so that a tester can model certain
     static properties of a Python-based scientific applications.

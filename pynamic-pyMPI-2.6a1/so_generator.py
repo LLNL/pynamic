@@ -199,7 +199,7 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
     f.close()
 
 # compile a .c file into a Python-usable .so file
-def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
+def compile_file(file_prefix, num_module_files, num_utility_files, include_dir, CC):
     filename = file_prefix + '.c'
     cwd = os.getcwd()
     outfile = file_prefix + '.so'
@@ -208,6 +208,9 @@ def compile_file(file_prefix, i, num_utility_files, include_dir, CC):
     else:
         command = '%s -g -fPIC -shared' %(CC)
     if file_prefix.find('module') != -1:
+        if file_prefix.find('begin') != -1:
+            for i in range(num_module_files):
+                command += ' -lmodule' + str(i)
         command += ' -I%s' %(include_dir)
         command += ' -Wl,-rpath=' + cwd + ' -L' + cwd
         for i in range(num_utility_files):
@@ -260,6 +263,7 @@ if myRank == 0:
 """
     f.write(text)
 
+    f.write('import libmodulebegin\n')
     for i in range(num_files):
         f.write('import libmodule' + str(i) + '\n')
     f.write('import libmodulefinal\n')
@@ -274,6 +278,7 @@ if myRank == 0:
 """
     f.write(text)
 
+    f.write('libmodulebegin.begin_break_here()\n')
     for i in range(num_files):
         f.write('libmodule' + str(i) + '.libmodule' + str(i) + '_entry()\n')
     f.write('libmodulefinal.break_here()\n')
@@ -332,7 +337,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
     for p,d,f in os.walk('./'):
         if p == './':
             for file in f:
-                if (file.find('libmodule') != -1 or file.find('libutility') != -1 or file.find('pynamic.h') != -1) and file.find('libmodulefinal.c') == -1:
+                if (file.find('libmodule') != -1 or file.find('libutility') != -1 or file.find('pynamic.h') != -1) and file.find('libmodulefinal.c') == -1 and file.find('libmodulebegin.c') == -1:
                     os.remove(file)
 
     if extern:
@@ -372,6 +377,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         for i in range(num_utility_files):
             command = 'ar cru libpynamic.a %s' %(file_prefix+str(i)+'.o')
             run_command(command)
+    pynamic_header_file.write('void initlibmodulebegin();\n')
     for i in range(num_files - num_utility_files):
         pynamic_header_file.write('void initlibmodule%d();\n' %(i))
     pynamic_header_file.write('void initlibmodulefinal();\n')
@@ -390,6 +396,10 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
     command = 'ranlib libpynamic.a'
     run_command(command)
 
+    compile_file("libmodulebegin", num_files - num_utility_files, 0, include_dir, CC)
+    command = 'ar cru libpynamic.a libmodulebegin.o'
+    run_command(command)
+
     f = open("pyMPI_initialize.c", "r")
     lines = f.readlines()
     f.close()
@@ -399,6 +409,7 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         if line.find('pyMPI_Macros.h') != -1:
             f.write('#include "pynamic.h"\n')
         if line.find('PyImport_AppendInittab') != -1:
+            f.write('  PyImport_AppendInittab("libmodulebegin", initlibmodulebegin);\n')
             for i in range(num_files - num_utility_files):
                 f.write('  PyImport_AppendInittab("libmodule%d", initlibmodule%d);\n' %(i, i))
             f.write('  PyImport_AppendInittab("libmodulefinal", initlibmodulefinal);\n')
