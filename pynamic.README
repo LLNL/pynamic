@@ -200,7 +200,7 @@
     An optional 4th pynamic-bigexe-pyMPI and 5th pynamic-bigexe-sdb-pyMPI
     executable can be built with the -b option, which is equivalent to
     pynamic-pyMPI and pynamic-sdb-pyMPI respectively, but with extra code to
-    make the base executable much larger.
+    make the base executable much larger (this may take a long time to compile).
 
   3.1 TO TEST
     % python pynamic_driver.py `date +%s`
