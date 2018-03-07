@@ -5398,17 +5398,24 @@ echo "$as_me: WARNING: No installed lib/config for version $pyVERSION" >&2;}
 fi
 
 pyLIBRARY="libpython$pyVERSION$LIBEXT"
-echo "$as_me:$LINENO: checking $pyLIBRARY is there" >&5
+echo "$as_me:$LINENO: checking $pyLIBRARY or libpython$pyVERSION.so is there" >&5
 echo $ECHO_N "checking $pyLIBRARY is there... $ECHO_C" >&6
 if test -r "$PYLIBCONFIGDIR/$pyLIBRARY"; then
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
   LIBS="$LIBS -lpython$pyVERSION"
 else
-  echo "$as_me:$LINENO: result: not there" >&5
+  pyLIBRARY="libpython$pyVERSION.so"
+  if test -r "$PYLIBCONFIGDIR/$pyLIBRARY"; then
+    echo "$as_me:$LINENO: result: yes" >&5
+    echo "${ECHO_T}yes" >&6
+    LIBS="$LIBS -lpython$pyVERSION"
+  else
+    echo "$as_me:$LINENO: result: not there" >&5
+  fi
 echo "${ECHO_T}not there" >&6
-  { echo "$as_me:$LINENO: WARNING: If you get link errors add a --with-libs=-L/path/to/dir where $pyLIBRARY lives" >&5
-echo "$as_me: WARNING: If you get link errors add a --with-libs=-L/path/to/dir where $pyLIBRARY lives" >&2;}
+  { echo "$as_me:$LINENO: WARNING: If you get link errors add a --with-libs=-L/path/to/dir where libpython$pyVERSION$LIBEXT or libpython$pyVERSION.so lives" >&5
+echo "$as_me: WARNING: If you get link errors add a --with-libs=-L/path/to/dir where $libpython$pyVERSION$LIBEXT or $libpython$pyVERSION.so lives" >&2;}
 fi
 
 cat >>confdefs.h <<_ACEOF
