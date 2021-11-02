@@ -374,9 +374,10 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
     run_command(command)
 
     if num_utility_files > 0:
+        command = 'ar cru libpynamic.a '
         for i in range(num_utility_files):
-            command = 'ar cru libpynamic.a %s' %(file_prefix+str(i)+'.o')
-            run_command(command)
+            command = '%s %s' %(command, file_prefix+str(i)+'.o')
+        run_command(command)
     pynamic_header_file.write('void initlibmodulebegin();\n')
     for i in range(num_files - num_utility_files):
         pynamic_header_file.write('void initlibmodule%d();\n' %(i))
@@ -389,8 +390,10 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         generate_c_file(file_prefix, i, num_functions, call_depth, extern, utility_enabled, fun_print, name_length)
     results = [pool.apply_async(compile_file, args=(file_prefix+str(i), i, num_utility_files, include_dir, CC)) for i in range(num_files - num_utility_files)]
     [p.get() for p in results]
-    for i in range(num_files - num_utility_files):
-        command = 'ar cru libpynamic.a %s' %(file_prefix+str(i)+'.o')
+    if num_files - num_utility_files > 0:
+        command = 'ar cru libpynamic.a '
+        for i in range(num_files - num_utility_files):
+            command = '%s %s' %(command, file_prefix+str(i)+'.o')
         run_command(command)
 
     command = 'ranlib libpynamic.a'
