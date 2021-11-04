@@ -18,7 +18,14 @@ static PyMethodDef libmodulefinal_importMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-void initlibmodulefinal()
+PyMODINIT_FUNC PyInit_libmodulefinal()
 {
-    Py_InitModule("libmodulefinal", libmodulefinal_importMethods);
+   static struct PyModuleDef finalmodule = {
+      PyModuleDef_HEAD_INIT,
+      "libmodulefinal",
+      "",
+      -1,
+      libmodulefinal_importMethods
+   };
+   return PyModule_Create(&finalmodule);
 }

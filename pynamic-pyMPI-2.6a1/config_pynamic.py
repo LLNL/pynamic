@@ -22,41 +22,52 @@ import os
 if len(sys.argv) < 3:
     print_usage('config_pynamic.py')
     sys.exit(1)
-configure_args, python_command, bigexe = parse_and_run('config_pynamic.py')
+configure_args, python_command, bigexe, use_mpi4py, processes = parse_and_run('config_pynamic.py')
 
-#
-# configure pyMPI with the pynamic-generated libraries
-#
-command = './configure --with-prompt-nl --with-isatty --with-libs="'
-command += '-Wl,-rpath=%s ' %(os.getcwd())
-for p, d, f in os.walk('./'):
-    for file in f:
-        if file.find('.so') != -1 and file.find('lib') != -1:
-            command += '-l' + file[3:file.find('.')] + ' '
-command += '" '
-for arg in configure_args:
-    command += arg + ' '
-ret = run_command(command, False)
-if ret != 0:
-    print('configure returned an error! Please specify/fix configure args with the -c option')
-    sys.exit(ret)
-
-#
-# run the pyMPI Makefile
-#
-command = 'make clean'
-run_command(command)
-
-command = 'make dist-local'
-run_command(command)
-
-command = 'make -j'
-run_command(command)
-
+if not use_mpi4py:
+    #
+    # configure pyMPI or mpi4py with the pynamic-generated libraries
+    #
+    command = './configure --with-prompt-nl --with-isatty --with-python=%s --with-libs="' % (sys.executable)
+    command += '-Wl,-rpath=%s ' %(os.getcwd())
+    for p, d, f in os.walk('./'):
+        for file in f:
+            if file.find('.so') != -1 and file.find('lib') != -1:
+                command += '-l' + file[3:file.find('.')] + ' '
+    command += '" '
+    for arg in configure_args:
+        command += arg + ' '
+    
+    ret = run_command(command, False)
+    if ret != 0:
+        print('configure returned an error! Please specify/fix configure args with the -c option')
+        sys.exit(ret)
+    
+    #
+    # run the pyMPI Makefile
+    #
+    command = 'make clean'
+    run_command(command)
+    
+    command = 'make dist-local'
+    run_command(command)
+    
+    command = 'make -j ' + str(processes) + target
+    run_command(command)
+else:
+    command = 'make clean'
+    run_command(command)
+    
+    target = 'pynamic-mpi4py'
+    if bigexe:
+        target += ' pynamic-bigexe-mpi4py'
+    command = 'make -j ' + str(processes) + ' -f Makefile.mpi4py ' + target
+    run_command(command)
+    
 if bigexe == False:
-    command = 'rm -f pynamic-bigexe-pyMPI pynamic-bigexe-sdb-pyMPI'
+    command = 'rm -f pynamic-bigexe-pyMPI pynamic-bigexe-sdb-pyMPI pynamic-bigexe-mpi4py'
     run_command(command, False)
-
+    
 #
 # build the addall utility program
 #
@@ -74,7 +85,7 @@ if os.path.exists('./get-symtab-sizes') != True:
     print_error('required file get-symtab-sizes not found!')
     sys.exit(0)
 
-for exe in ['pynamic-pyMPI', 'pynamic-sdb-pyMPI', 'pynamic-bigexe-pyMPI', 'pynamic-bigexe-sdb-pyMPI']:
+for exe in ['pynamic-pyMPI', 'pynamic-sdb-pyMPI', 'pynamic-bigexe-pyMPI', 'pynamic-bigexe-sdb-pyMPI', 'pynamic-mpi4py', 'pynamic-bigexe-mpi4py']:
     info_file = 'sharedlib_section_info_%s' %(exe)
     os.system('rm -f %s' %(info_file))
     if os.path.exists(exe):

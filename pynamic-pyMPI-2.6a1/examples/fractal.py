@@ -10,8 +10,7 @@ def makeBMPHeader( width, height ):
     headerBytes += [40] + 3*[0] + [100] + 3*[0] + [ 75,0,0,0,1,0,24] + [0]*9 + [18,11,0,0,18,11]
     headerBytes += [0]*10
 
-    #Pack this data as a string
-    data =""
+    data = b''
     for x in range(54):
         data += pack( 'B', headerBytes[x] )
         
@@ -41,11 +40,11 @@ bmpSize = (400,400)
 
 #Define the range of y-pixels in the BMP this process works on
 myYPixelRange = [ 0,0]
-myYPixelRange[0] = mpi.rank*bmpSize[1]/mpi.procs
-myYPixelRange[1] = (mpi.rank+1)*bmpSize[1]/mpi.procs
+myYPixelRange[0] = int(mpi.rank*bmpSize[1]/mpi.procs)
+myYPixelRange[1] = int((mpi.rank+1)*bmpSize[1]/mpi.procs)
 
 if mpi.rank == 0:
-    print "Starting computation (groan)\n"
+    print("Starting computation (groan)\n")
 
 #Now we can start to iterate over pixels!!
 myString = ""
@@ -83,27 +82,24 @@ for y in range( myYPixelRange[0], myYPixelRange[1]):
         myArray.append( int(myRGB[0]) )  #Red is last
 
 #Now I reduce the lists to process 0!!
-masterString = mpi.reduce( myArray.tostring(), mpi.SUM, 0 )
+masterArray = mpi.reduce( myArray, mpi.SUM, 0 )
 
 #Tell user that we're done
 message = "process " + str(mpi.rank) + " done with computation!!"
-print message
+print(message)
 
 #Process zero does the file writing
 if mpi.rank == 0:
-    masterArray = array('B')
-    masterArray.fromstring(masterString)
-
     #Write a BMP header
     myBMPHeader = makeBMPHeader( bmpSize[0], bmpSize[1] )
-    print "Header length is ", len(myBMPHeader)
-    print "BMP size is ", bmpSize
-    print "Data length is ", len(masterString)
+    print("Header length is ", len(myBMPHeader))
+    print("BMP size is ", bmpSize)
+    print("Data length is ", len(masterArray))
 
     #Open the output file and write to the BMP
-    outFile = open( 'output.bmp', 'w' )
+    outFile = open( 'output.bmp', 'wb' )
     outFile.write( myBMPHeader )
-    outFile.write( masterString )
+    outFile.write( masterArray )
     outFile.close()
 
 

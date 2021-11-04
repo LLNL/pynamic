@@ -18,7 +18,15 @@ static PyMethodDef libmodulebegin_importMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-void initlibmodulebegin()
+PyMODINIT_FUNC PyInit_libmodulebegin()
 {
-    Py_InitModule("libmodulebegin", libmodulebegin_importMethods);
+   static struct PyModuleDef beginmodule = {
+      PyModuleDef_HEAD_INIT,
+      "libmodulebeign",
+      "",
+      -1,
+      libmodulebegin_importMethods
+   };
+   return PyModule_Create(&beginmodule);
 }
+

@@ -66,7 +66,7 @@ AC_DEFUN([AC_PYTHON_MAKEVAR],[
    ac_python_makevar_value="Python $1"
  fi
  AC_MSG_CHECKING($ac_python_makevar_value)
- [ py$1=`$PYTHON -c "from distutils.sysconfig import parse_makefile, get_makefile_filename; print parse_makefile(get_makefile_filename())['$1']" | $SED 's|-Wl,-bE:Modules/python.exp||g'` ]
+ [ py$1=`$PYTHON -c "from distutils.sysconfig import parse_makefile, get_makefile_filename; print(parse_makefile(get_makefile_filename())['$1'])" | $SED 's|-Wl,-bE:Modules/python.exp||g'` ]
  AC_MSG_RESULT($py$1)
 ])
 
@@ -185,7 +185,6 @@ else
 fi
 AC_SUBST(PYMPI_PROMPT_NL)
 AC_DEFINE_UNQUOTED(PYMPI_PROMPT_NL,$PYMPI_PROMPT_NL,[Issue a newline after prompt])
-
 
 dnl ---------------------------------------------------
 dnl If we set CC in environment, use it, otherwise
@@ -338,9 +337,9 @@ if test -z "$PYTHON"; then
 	     *) ;;
            esac
 	   if test -x "$x"; then
-	     x_ok=`[$x -c 'print "OK"']`
+	     x_ok=`[$x -c 'print("OK")']`
 	     if test "$x_ok" = "OK"; then
-  		x_version=`[$x -c 'import sys; print sys.version[:3]']`
+  		x_version=`[$x -c 'import sys; print(sys.version[:3])']`
 	
 	        if test "$x_version" = "1.5"; then
                   AC_MSG_WARN($x is version 1.5, skipping)
@@ -390,7 +389,7 @@ dnl -----------------------------------------------
 dnl Disutils?
 dnl -----------------------------------------------
 AC_MSG_CHECKING(distutils?)
-PYDISTUTILS=`$PYTHON -c "import distutils; print 'yes'" 2>/dev/null`
+PYDISTUTILS=`$PYTHON -c "import distutils; print('yes')" 2>/dev/null`
 AC_MSG_RESULT($PYDISTUTILS)
 if test -z "$PYDISTUTILS"; then
   AC_MSG_ERROR("pyMPI requires distutils")
@@ -400,11 +399,11 @@ dnl -----------------------------------------------
 dnl Disutils works
 dnl -----------------------------------------------
 AC_MSG_CHECKING(distutils works)
-if [$PYTHON -c "from distutils.sysconfig import parse_makefile, get_makefile_filename; print parse_makefile(get_makefile_filename())['VERSION']" > /dev/null 2>&1]; then
+if [$PYTHON -c "from distutils.sysconfig import parse_makefile, get_makefile_filename; print(parse_makefile(get_makefile_filename())['VERSION'])" > /dev/null 2>&1]; then
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
-  [$PYTHON -c "from distutils.sysconfig import parse_makefile, get_makefile_filename; print parse_makefile(get_makefile_filename())['VERSION']"]
+  [$PYTHON -c "from distutils.sysconfig import parse_makefile, get_makefile_filename; print(parse_makefile(get_makefile_filename())['VERSION'])"]
   AC_MSG_ERROR(Your python distribution is incomplete.  Perhaps there is no XXX/lib/python2.x/config)
 fi
 
@@ -412,7 +411,7 @@ dnl -----------------------------------------------
 dnl Numeric
 dnl -----------------------------------------------
 AC_MSG_CHECKING(Numeric?)
-PYNUMERIC=`[$PYTHON -c "import Numeric; print 'yes'" 2>/dev/null]`
+PYNUMERIC=`[$PYTHON -c "import Numeric; print('yes')" 2>/dev/null]`
 AC_MSG_RESULT($PYNUMERIC)
 if test -n "$PYNUMERIC"; then
   AC_DEFINE(PYMPI_HAS_NUMERIC,,[Does this Python include Numeric?])
@@ -422,7 +421,7 @@ dnl -----------------------------------------------
 dnl Numpy
 dnl -----------------------------------------------
 AC_MSG_CHECKING(Numpy?)
-PYNUMPY=`[$PYTHON -c "import numpy; print 'yes'" 2>/dev/null]`
+PYNUMPY=`[$PYTHON -c "import numpy; print('yes')" 2>/dev/null]`
 AC_MSG_RESULT($PYNUMPY)
 if test -n "$PYNUMPY"; then
   AC_DEFINE(PYMPI_HAS_NUMPY,,[Does this Python include Numpy?])
@@ -441,7 +440,7 @@ dnl Intuit where the prefix is
 dnl -----------------------------------------------
 if test "$prefix" = "NONE"; then
   AC_MSG_CHECKING(install prefix for $PYTHON)
-  PYPREFIX=`$PYTHON -c "from distutils.sysconfig import PREFIX; print PREFIX" 2>/dev/null`
+  PYPREFIX=`$PYTHON -c "from distutils.sysconfig import PREFIX; print(PREFIX)" 2>/dev/null`
 
   if test "$PYPREFIX" = ""; then
     PYPREFIX="$ac_default_prefix"
@@ -474,7 +473,7 @@ dnl Checks for python header files.
 dnl -----------------------------------------------
 AC_MSG_CHECKING(for python includes locations)
 AC_SUBST(PYINCLUDEDIR)
-PYINCLUDEDIR=`$PYTHON -c "from distutils.sysconfig import get_python_inc; print get_python_inc()" 2>/dev/null`
+PYINCLUDEDIR=`$PYTHON -c "from distutils.sysconfig import get_python_inc; print(get_python_inc())" 2>/dev/null`
 AC_MSG_RESULT($PYINCLUDEDIR)
 
 AC_MSG_CHECKING(that include directory exists)
@@ -487,7 +486,7 @@ else
 fi
 
 AC_MSG_CHECKING(python_inc)
-PYINCLUDEDIRPLATFORM=`$PYTHON -c "from distutils.sysconfig import get_python_inc; print get_python_inc(1)" 2>/dev/null`
+PYINCLUDEDIRPLATFORM=`$PYTHON -c "from distutils.sysconfig import get_python_inc; print(get_python_inc(1))" 2>/dev/null`
 AC_MSG_RESULT($PYINCLUDEDIRPLATFORM)
 
 AC_MSG_CHECKING(that include directory exists)
@@ -505,7 +504,7 @@ dnl should take care of exec_prefix...
 dnl -----------------------------------------------
 if test -n "$PYNUMERIC"; then
   AC_MSG_CHECKING(for Numeric header files via exec_prefix)
-  PYLIBDIRPLATFORM=`$PYTHON -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)" 2>/dev/null`
+  PYLIBDIRPLATFORM=`$PYTHON -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))" 2>/dev/null`
   if test -r $PYLIBDIRPLATFORM/Numeric/core/include/numeric/arrayobject.h; then
     AC_MSG_RESULT($PYLIBDIRPLATFORM)
     CPPFLAGS="$CPPFLAGS -I$PYLIBDIRPLATFORM/numeric/core/include -I$PYINCLUDEDIR"
@@ -514,7 +513,7 @@ if test -n "$PYNUMERIC"; then
   fi
 
   AC_MSG_CHECKING(Numeric outside site-packages?)
-  PYNUMERICIDIR=`[$PYTHON -c "import Numeric,os; print os.path.split(numeric.__file__)[0]" 2>/dev/null]`
+  PYNUMERICIDIR=`[$PYTHON -c "import Numeric,os; print(os.path.split(numeric.__file__)[0])" 2>/dev/null]`
   if test -r $PYNUMERICIDIR/core/include/Numeric/arrayobject.h; then
     AC_MSG_RESULT($PYNUMERICIDIR)
     CPPFLAGS="$CPPFLAGS -I$PYNUMERICIDIR/core/include"
@@ -524,7 +523,7 @@ if test -n "$PYNUMERIC"; then
 fi
 if test -n "$PYNUMPY"; then
   AC_MSG_CHECKING(for numpy header files via exec_prefix)
-  PYLIBDIRPLATFORM=`$PYTHON -c "from distutils.sysconfig import get_python_lib; print get_python_lib(1)" 2>/dev/null`
+  PYLIBDIRPLATFORM=`$PYTHON -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))" 2>/dev/null`
   if test -r $PYLIBDIRPLATFORM/numpy/core/include/numpy/arrayobject.h; then
     AC_MSG_RESULT($PYLIBDIRPLATFORM)
     CPPFLAGS="$CPPFLAGS -I$PYLIBDIRPLATFORM/numpy/core/include -I$PYINCLUDEDIR"
@@ -533,7 +532,7 @@ if test -n "$PYNUMPY"; then
   fi
 
   AC_MSG_CHECKING(numpy outside site-packages?)
-  PYNUMPYIDIR=`[$PYTHON -c "import numpy,os; print os.path.split(numpy.__file__)[0]" 2>/dev/null]`
+  PYNUMPYIDIR=`[$PYTHON -c "import numpy,os; print(os.path.split(numpy.__file__)[0])" 2>/dev/null]`
   if test -r $PYNUMPYIDIR/core/include/numpy/arrayobject.h; then
     AC_MSG_RESULT($PYNUMPYIDIR)
     CPPFLAGS="$CPPFLAGS -I$PYNUMPYIDIR/core/include"
@@ -548,7 +547,7 @@ dnl Checks for python lib files...
 dnl -----------------------------------------------
 AC_MSG_CHECKING(for python library location)
 AC_SUBST(PYLIBDIR)
-PYLIBDIR=`$PYTHON -c "from distutils.sysconfig import get_python_lib; print get_python_lib()" 2>/dev/null`
+PYLIBDIR=`$PYTHON -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())" 2>/dev/null`
 AC_MSG_RESULT($PYLIBDIR)
 
 AC_MSG_CHECKING(that lib directory is accessable)
@@ -564,7 +563,7 @@ dnl Checks for python lib/config files...
 dnl -----------------------------------------------
 AC_MSG_CHECKING(for python lib/config location)
 AC_SUBST(PYLIBCONFIGDIR)
-[ PYLIBCONFIGDIR=`$PYTHON -c "from distutils.sysconfig import get_makefile_filename; import os; print os.path.split(get_makefile_filename())[0]" 2>/dev/null` ]
+[ PYLIBCONFIGDIR=`$PYTHON -c "from distutils.sysconfig import get_makefile_filename; import os; print(os.path.split(get_makefile_filename())[0])" 2>/dev/null` ]
 AC_MSG_RESULT($PYLIBCONFIGDIR)
 AC_DEFINE_UNQUOTED(PYMPI_PYTHON_CONFIGDIR,"$PYLIBCONFIGDIR",[Directory where python library files live])
 
@@ -654,7 +653,7 @@ dnl -----------------------------------------------
 dnl added by ej: tries intuiting the mpi include path
 dnl              from $CC.
 dnl -----------------------------------------------
-MPI_BASE=`$PYTHON -c "import os; print os.path.dirname('$CC')"`
+MPI_BASE=`$PYTHON -c "import os; print(os.path.dirname('$CC'))"`
 AC_MSG_CHECKING(for compiler based include directory)
 if test -d "$MPI_BASE" -a -r "$MPI_BASE/include/mpi.h"; then
   CPPFLAGS="-I$MPI_BASE/include $CPPFLAGS"

@@ -1,0 +1,38 @@
+.PHONY: default clean
+
+default: pynamic-mpi4py pynamic-bigexe-mpi4py
+
+PYTHON_EXE ?= $(shell which python)
+PYTHON_DIR = $(dir $(PYTHON_EXE))
+PYTHON_CONFIG = $(PYTHON_DIR)/python-config
+
+CC = mpicc
+PYTHON_CFLAGS = $(shell $(PYTHON_CONFIG) --embed --cflags)
+PYTHON_LDFLAGS = $(shell $(PYTHON_CONFIG) --embed --ldflags)
+
+CFLAGS += -Wall
+LDFLAGS = 
+
+BIGEXE_SOURCES = foo0.c foo1.c foo2.c foo3.c foo4.c foo5.c foo6.c foo7.c foo8.c foo9.c
+BIGEXE_OBJS = $(BIGEXE_SOURCES:.c=.o)
+
+MAIN_SOURCES = mpi4py_main.c
+MAIN_OBJS = $(MAIN_SOURCES:.c=.o)
+
+MAKEFILE_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
+$(MAIN_OBJS): $(MAIN_SOURCES)
+	$(CC) '-DROOT_DIR=$(MAKEFILE_DIR)' -c $(CFLAGS) $(PYTHON_CFLAGS) -o $@ $<
+
+$(BIGEXE_OBJS): $(BIGEXE_SOURCES) fooN.c
+	$(CC) -DBUILD_PYNAMIC_BIGEXE -c $(CFLAGS) -o $@ $(@:.o=.c)
+
+pynamic-mpi4py: $(MAIN_OBJS)
+	$(CC) $(PYTHON_LDFLAGS) -o $@ $^
+
+pynamic-bigexe-mpi4py: $(MAIN_OBJS) $(BIGEXE_OBJS)
+	$(CC) $(PYTHON_LDFLAGS) -o $@ $(MAIN_OBJS) $(BIGEXE_OBJS)
+
+clean:
+	rm -f pynamic-bigexe-mpi4py pynamic-mpi4py $(BIGEXE_OBJS) $(MAIN_OBJS)
+
