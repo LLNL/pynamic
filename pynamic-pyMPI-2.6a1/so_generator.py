@@ -590,8 +590,12 @@ def parse_and_run(executable):
         print('# invalid arguments passed! #')
         print('#############################')
         print_usage(executable)
-
+        
     run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC, processes)
+
+    if use_mpi4py:
+        os.environ["NUM_UTILITIES"] = str(num_utility_files)
+        os.environ["NUM_MODULES"] = str(num_files - num_utility_files)
 
     return configure_args, python_command, bigexe, use_mpi4py, processes
 

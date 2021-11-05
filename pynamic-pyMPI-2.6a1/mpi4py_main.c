@@ -15,6 +15,7 @@ int main(int argc, char *argv[])
 {
    char *orig_pythonpath, *pythonpath;
    unsigned long len;
+   int rank;
 
    orig_pythonpath = getenv("PYTHONPATH");
    if (!orig_pythonpath) {
@@ -29,6 +30,8 @@ int main(int argc, char *argv[])
    
    MPI_Init(&argc, &argv);
 
+   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+   printf("rank - %d\n", (int) rank);
    Py_Initialize();
    PyRun_SimpleString("import pynamic_driver_mpi4py\n");
    Py_Finalize();
