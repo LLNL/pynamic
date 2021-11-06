@@ -6,12 +6,17 @@ PYTHON_EXE ?= $(shell which python)
 NUM_UTILITIES ?= $(shell ls libutility[0123456789]*.so | wc -l)
 NUM_MODULES ?= $(shell ls libmodule[0123456789]*.so | wc -l)
 
-PYTHON_DIR = $(dir $(PYTHON_EXE))
-PYTHON_CONFIG = $(PYTHON_DIR)/python-config
+PYTHON_EXE_DIR = $(shell $(PYTHON_EXE) -c 'import sys; import os; print(os.path.dirname(sys.executable))')
+PYTHON_CONFIG = $(PYTHON_EXE_DIR)/python-config
+
+PYTHON_EMBED = $(shell if [ `$(PYTHON_CONFIG) --embed > /dev/null 2>&1 ; echo $$?` == 0 ] ; then echo --embed; fi)
+
+echo:
+	@echo $(PYTHON_CONFIG) $(PYTHON_EMBED)
 
 CC = mpicc
-PYTHON_CFLAGS = $(shell $(PYTHON_CONFIG) --embed --cflags)
-PYTHON_LDFLAGS = $(shell $(PYTHON_CONFIG) --embed --ldflags)
+PYTHON_CFLAGS = $(shell $(PYTHON_CONFIG) $(PYTHON_EMBED) --cflags)
+PYTHON_LDFLAGS = $(shell $(PYTHON_CONFIG) $(PYTHON_EMBED) --ldflags)
 
 CFLAGS += -Wall
 LDFLAGS = 
@@ -41,12 +46,6 @@ pynamic-mpi4py: $(MAIN_OBJS) $(MODULE_LIBS) $(UTIL_LIBS)
 
 pynamic-bigexe-mpi4py: $(MAIN_OBJS) $(BIGEXE_OBJS) $(MODULE_LIBS) $(UTIL_LIBS)
 	$(CC) $(PYTHON_LDFLAGS) -o $@ $(MAIN_OBJS) $(BIGEXE_OBJS) $(MODULE_LIBS) $(UTIL_LIBS) $(BASE_MODULE_LIBS) -L$(PYNAMICDIR)
-
-echo:
-	@echo $(NUM_UTILITIES)
-	@echo $(UTIL_LIBS)
-	@echo $(NUM_MODULES)
-	@echo $(MODULE_LIBS)
 
 clean:
 	rm -f pynamic-bigexe-mpi4py pynamic-mpi4py $(BIGEXE_OBJS) $(MAIN_OBJS)
