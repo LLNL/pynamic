@@ -52,7 +52,7 @@ if not use_mpi4py:
     command = 'make dist-local'
     run_command(command)
     
-    command = 'make -j ' + str(processes) + target
+    command = 'make -j ' + str(processes)
     run_command(command)
 else:
     command = 'make clean'

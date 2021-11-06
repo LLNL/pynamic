@@ -1,6 +1,6 @@
 #include <Python.h>
 
-volatile int v;
+static volatile int v;
 
 void break_here()
 {
@@ -18,6 +18,12 @@ static PyMethodDef libmodulefinal_importMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
+#if PY_MAJOR_VERSION == 2
+void initlibmodulefinal()
+{
+   Py_InitModule("libmodulefinal", libmodulefinal_importMethods);
+}
+#else
 PyMODINIT_FUNC PyInit_libmodulefinal()
 {
    static struct PyModuleDef finalmodule = {
@@ -29,3 +35,4 @@ PyMODINIT_FUNC PyInit_libmodulefinal()
    };
    return PyModule_Create(&finalmodule);
 }
+#endif
