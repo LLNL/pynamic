@@ -11,15 +11,11 @@ PYTHON_CONFIG = $(PYTHON_EXE_DIR)/python-config
 
 PYTHON_EMBED = $(shell if [ `$(PYTHON_CONFIG) --embed > /dev/null 2>&1 ; echo $$?` == 0 ] ; then echo --embed; fi)
 
-echo:
-	@echo $(PYTHON_CONFIG) $(PYTHON_EMBED)
-
 CC = mpicc
 PYTHON_CFLAGS = $(shell $(PYTHON_CONFIG) $(PYTHON_EMBED) --cflags)
 PYTHON_LDFLAGS = $(shell $(PYTHON_CONFIG) $(PYTHON_EMBED) --ldflags)
 
 CFLAGS += -Wall
-LDFLAGS = 
 
 BIGEXE_SOURCES = foo0.c foo1.c foo2.c foo3.c foo4.c foo5.c foo6.c foo7.c foo8.c foo9.c
 BIGEXE_OBJS = $(BIGEXE_SOURCES:.c=.o)

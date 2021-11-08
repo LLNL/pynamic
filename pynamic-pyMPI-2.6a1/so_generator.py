@@ -602,6 +602,7 @@ def parse_and_run(executable):
     if use_mpi4py:
         os.environ["NUM_UTILITIES"] = str(num_utility_files)
         os.environ["NUM_MODULES"] = str(num_files - num_utility_files)
+        os.environ["PYTHON_EXE"] = python_command
 
     return configure_args, python_command, bigexe, use_mpi4py, processes
 
