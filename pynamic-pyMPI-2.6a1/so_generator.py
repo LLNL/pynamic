@@ -11,6 +11,7 @@ import sys, os, string
 import random
 import multiprocessing as mp
 from subprocess import *
+from sysconfig import get_paths
 
 var_types = ['int', 'long', 'float', 'double', 'char *']
 
@@ -192,10 +193,23 @@ def generate_c_file(file_prefix_in, my_id, num_functions, call_depth, extern, ut
         f.write('\t{"' + function_name + '", py_' + function_name + ', METH_VARARGS, "a function."},\n')
         f.write('\t{NULL, NULL, 0, NULL}\n')
         f.write('};\n\n')
-        f.write('void init' + file_prefix + '()\n')
-        f.write('{\n')
-        f.write('\tPy_InitModule("' + file_prefix + '", ' + file_prefix + 'Methods);\n')
-        f.write('}\n\n')
+        if sys.version_info.major == 2:
+            f.write('void init' + file_prefix + '()\n')
+            f.write('{\n')
+            f.write('\tPy_InitModule("' + file_prefix + '", ' + file_prefix + 'Methods);\n')
+            f.write('}\n\n')
+        else:
+            f.write('PyMODINIT_FUNC PyInit_' + file_prefix + '()\n')
+            f.write('{\n')
+            f.write('\tstatic struct PyModuleDef mod = {\n')
+            f.write('\t\tPyModuleDef_HEAD_INIT,\n')
+            f.write('"' + file_prefix + '",\n')
+            f.write('"",\n')
+            f.write('-1,\n')
+            f.write(file_prefix + 'Methods\n')
+            f.write('};\n')
+            f.write('return PyModule_Create(&mod);\n')
+            f.write('}\n\n')
     f.close()
 
 # compile a .c file into a Python-usable .so file
@@ -309,8 +323,8 @@ if myRank == 0:
     text = """mpi.barrier()
 if myRank == 0:
     mpi_end = time.time()
-    print '\\nPynamic: fractal mpi time = ' + str(mpi_end - mpi_start) + ' secs'
-    print 'Pynamic: mpi test passed!\\n'
+    print('\\nPynamic: fractal mpi time = ' + str(mpi_end - mpi_start) + ' secs')
+    print('Pynamic: mpi test passed!\\n')
 """
     f.write(text)
 
@@ -374,9 +388,10 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
     run_command(command)
 
     if num_utility_files > 0:
+        command = 'ar cru libpynamic.a '
         for i in range(num_utility_files):
-            command = 'ar cru libpynamic.a %s' %(file_prefix+str(i)+'.o')
-            run_command(command)
+            command = '%s %s' %(command, file_prefix+str(i)+'.o')
+        run_command(command)
     pynamic_header_file.write('void initlibmodulebegin();\n')
     for i in range(num_files - num_utility_files):
         pynamic_header_file.write('void initlibmodule%d();\n' %(i))
@@ -389,8 +404,10 @@ def run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, see
         generate_c_file(file_prefix, i, num_functions, call_depth, extern, utility_enabled, fun_print, name_length)
     results = [pool.apply_async(compile_file, args=(file_prefix+str(i), i, num_utility_files, include_dir, CC)) for i in range(num_files - num_utility_files)]
     [p.get() for p in results]
-    for i in range(num_files - num_utility_files):
-        command = 'ar cru libpynamic.a %s' %(file_prefix+str(i)+'.o')
+    if num_files - num_utility_files > 0:
+        command = 'ar cru libpynamic.a '
+        for i in range(num_files - num_utility_files):
+            command = '%s %s' %(command, file_prefix+str(i)+'.o')
         run_command(command)
 
     command = 'ranlib libpynamic.a'
@@ -471,6 +488,10 @@ def print_usage(executable):
     print('--with-cc=<command>')
     print('\tuse the C compiler located at <command> to build Pynamic modules.\n')
     print('--with-python=<command>')
+    print('--with-mpi4py')
+    print('\tBuild with mpi4py. Default on Python3+')
+    print('--with-pympi')
+    print('\tBuild with pympi. Default on Python2')
     print('\tuse the python located at <command> to build Pynamic modules.  Will')
     print('\talso be passed to the pyMPI configure script.\n')
     sys.exit(-1)
@@ -497,11 +518,15 @@ def parse_and_run(executable):
         seedval = -1
         next = 0
         fun_print = False
+        use_mpi4py = False
         name_length = 0
         include_dir = ''
         configure_args = []
-        python_command = 'python'
+        python_command = sys.executable
         processes = 1
+        if sys.version_info.major > 2:
+            use_mpi4py = True
+            
         try:
             CC = os.environ['CC']
         except:
@@ -547,6 +572,10 @@ def parse_and_run(executable):
                 elif sys.argv[i].find('--with-python=') != -1:
                     configure_args.append(sys.argv[i])
                     python_command = sys.argv[i][14:]
+                elif sys.argv[i].find('--with-mpi4py') != -1:
+                    use_mpi4py = True
+                elif sys.argv[i].find('--with-pympi') != -1:
+                    use_mpi4py = False
                 else:
                     print_error('Unknown option %s' %(sys.argv[i]))
                     print_usage(executable)
@@ -555,14 +584,7 @@ def parse_and_run(executable):
 
         if include_dir == '':
             # try to automatically find include directory for default python
-            output = Popen([python_command, "-c",  "import sys; sys.stdout.write(sys.prefix)"], stdout = PIPE, stderr = PIPE).communicate()
-            base_dir = output[0]
-            if output[1].find('no python') != -1:
-                exit = 1
-                print_error('Could not find Python.  Please specify Python include directory with -i')
-            output = Popen([python_command, "-V"], stdout = PIPE, stderr = PIPE).communicate()
-            version = output[1].split()[1][0:3]
-            include_dir = '%s/include/python%s' %(base_dir, version)
+            include_dir = get_paths()['include']
     except Exception as e:
         import traceback
         print(repr(e))
@@ -574,10 +596,15 @@ def parse_and_run(executable):
         print('# invalid arguments passed! #')
         print('#############################')
         print_usage(executable)
-
+        
     run_so_generator(num_files, avg_num_functions, call_depth, extern, seed, seedval, num_utility_files, avg_num_u_functions, fun_print, name_length, include_dir, CC, processes)
 
-    return configure_args, python_command, bigexe
+    if use_mpi4py:
+        os.environ["NUM_UTILITIES"] = str(num_utility_files)
+        os.environ["NUM_MODULES"] = str(num_files - num_utility_files)
+        os.environ["PYTHON_EXE"] = python_command
+
+    return configure_args, python_command, bigexe, use_mpi4py, processes
 
 #MAIN FUNCTION
 if __name__ == '__main__':

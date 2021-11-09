@@ -1,0 +1,48 @@
+.PHONY: default clean
+
+default: pynamic-mpi4py pynamic-bigexe-mpi4py
+
+PYTHON_EXE ?= $(shell which python3)
+NUM_UTILITIES ?= $(shell ls libutility[0123456789]*.so | wc -l)
+NUM_MODULES ?= $(shell ls libmodule[0123456789]*.so | wc -l)
+
+PYTHON_EXE_DIR = $(shell $(PYTHON_EXE) -c 'import sys; import os; print(os.path.dirname(sys.executable))')
+PYTHON_CONFIG = $(PYTHON_EXE_DIR)/python-config
+
+PYTHON_EMBED = $(shell if [ `$(PYTHON_CONFIG) --embed > /dev/null 2>&1 ; echo $$?` == 0 ] ; then echo --embed; fi)
+
+CC = mpicc
+PYTHON_CFLAGS = $(shell $(PYTHON_CONFIG) $(PYTHON_EMBED) --cflags)
+PYTHON_LDFLAGS = $(shell $(PYTHON_CONFIG) $(PYTHON_EMBED) --ldflags)
+
+CFLAGS += -Wall
+
+BIGEXE_SOURCES = foo0.c foo1.c foo2.c foo3.c foo4.c foo5.c foo6.c foo7.c foo8.c foo9.c
+BIGEXE_OBJS = $(BIGEXE_SOURCES:.c=.o)
+
+MAIN_SOURCES = mpi4py_main.c
+MAIN_OBJS = $(MAIN_SOURCES:.c=.o)
+
+MAKEFILE_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
+UTIL_LIBS := $(shell for s in {1..$(NUM_UTILITIES)}; do echo -lutility$$(($$s - 1)); done)
+MODULE_LIBS := $(shell for s in {1..$(NUM_MODULES)}; do echo -lmodule$$(($$s - 1)); done)
+BASE_MODULE_LIBS = -lmodulebegin -lmodulefinal
+
+PYNAMICDIR := $(dir $(abspath $(firstword $(MAKEFILE_LIST))))
+
+$(MAIN_OBJS): $(MAIN_SOURCES)
+	$(CC) '-DROOT_DIR=$(MAKEFILE_DIR)' -c $(CFLAGS) $(PYTHON_CFLAGS) -o $@ $<
+
+$(BIGEXE_OBJS): $(BIGEXE_SOURCES) fooN.c 
+	$(CC) -DBUILD_PYNAMIC_BIGEXE -c $(CFLAGS) -o $@ $(@:.o=.c)
+
+pynamic-mpi4py: $(MAIN_OBJS) $(MODULE_LIBS) $(UTIL_LIBS)
+	$(CC) $(PYTHON_LDFLAGS) -o $@ $(MAIN_OBJS) $(MODULE_LIBS) $(UTIL_LIBS) $(BASE_MODULE_LIBS) -L$(PYNAMICDIR) $(LDFLAGS)
+
+pynamic-bigexe-mpi4py: $(MAIN_OBJS) $(BIGEXE_OBJS) $(MODULE_LIBS) $(UTIL_LIBS)
+	$(CC) $(PYTHON_LDFLAGS) -o $@ $(MAIN_OBJS) $(BIGEXE_OBJS) $(MODULE_LIBS) $(UTIL_LIBS) $(BASE_MODULE_LIBS) -L$(PYNAMICDIR) $(LDFLAGS)
+
+clean:
+	rm -f pynamic-bigexe-mpi4py pynamic-mpi4py $(BIGEXE_OBJS) $(MAIN_OBJS)
+

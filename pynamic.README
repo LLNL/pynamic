@@ -2,6 +2,7 @@
 # FILE: pynamic.README
 #
 # Updates:
+#          Nov 05 2021 MPL: Add support for python3 when built with mpi4py
 #          Feb 26 2018 GLL: Allow parallel builds with -j option
 #                           updated config.guess (to work for ppc64le)
 #          Apr 29 2014 GLL: Renamed pynamic-bigexe to pynamic-bigexe-pyMPI
@@ -94,6 +95,12 @@
 
 --------------------------------------------------------
 3. HOW TO BUILD AND TEST
+
+If you are building pynamic against a Python version 2, then pynamic will
+build against its included pympi implementation.  If you are building
+against Python version 3, then pynamic will use mpi4py, which must be loaded
+into an existing python3 environment.
+
   3.1 To BUILD
     % cd pynamic-pyMPI-2.6a1
     % config_pynamic.py
@@ -147,6 +154,11 @@
               use the python located at <command> to build Pynamic modules.  Will
               also be passed to the pyMPI configure script.
 
+      --with-mpi4py
+              Build against mpi4py rather than pyMPI.  This requires the backing
+              python to have the mpi4py module installed, and is default when
+              building pynamic with Python3+.
+
 
     --------------------------------------------------------
 
@@ -193,6 +205,8 @@
     shared libraries are desired, please look into the full report:
     "sharedlib_section_info_<exe_name>"
 
+    WITH PYTHON2 AND PYMPI:
+    
     Pynamic creates 3 executables: 1. pyMPI, which is a vanilla pyMPI that
     must dlopen imported modules; 2. pynamic-pyMPI, which is dynamically
     linked to the generated modules and utility libraries; 3. pynamic-sdb-pyMPI,
@@ -202,7 +216,17 @@
     pynamic-pyMPI and pynamic-sdb-pyMPI respectively, but with extra code to
     make the base executable much larger (this may take a long time to compile).
 
+    WITH PYTHON3+ AND MPI4PY:
+
+    Pynamic creates one executable pynamic-mpi4py, which is dynamically
+    linked to the generated modules and utility libraries.  Optionally,
+    pynamic can be configured to create a pynamic-bigexe-mpi4py with the
+    -b option to configure.
+
   3.1 TO TEST
+
+    WITH PYTHON2 AND PYMPI:
+
     % python pynamic_driver.py `date +%s`
 
       or in a batchxterm:
@@ -223,6 +247,12 @@
     #    pynamic-bigexe-pyMPI - a larger pyMPI with the generated .so's linked in
     #    pynamic-bigexe-sdb-pyMPI - a larger pyMPI with the generated libraries staically linked in
 
+    WITH PYTHON3+ AND MPI4PY:
+
+    % srun pynamic-mpi4py `date +%s`
+
+    % srun pynamic-bigexe-mpi4py `date +%s`
+    
 --------------------------------------------------------
 4. CONTACTS
    Greg Lee <lee218@llnl.gov>	

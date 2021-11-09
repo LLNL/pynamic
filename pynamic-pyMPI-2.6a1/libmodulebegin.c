@@ -1,6 +1,6 @@
 #include <Python.h>
 
-volatile int v;
+static volatile int v;
 
 void begin_break_here()
 {
@@ -18,7 +18,21 @@ static PyMethodDef libmodulebegin_importMethods[] = {
     {NULL, NULL, 0, NULL}
 };
 
+#if PY_MAJOR_VERSION == 2
 void initlibmodulebegin()
 {
-    Py_InitModule("libmodulebegin", libmodulebegin_importMethods);
+   Py_InitModule("libmodulebegin", libmodulebegin_importMethods);
 }
+#else
+PyMODINIT_FUNC PyInit_libmodulebegin()
+{
+   static struct PyModuleDef beginmodule = {
+      PyModuleDef_HEAD_INIT,
+      "libmodulebeign",
+      "",
+      -1,
+      libmodulebegin_importMethods
+   };
+   return PyModule_Create(&beginmodule);
+}
+#endif
