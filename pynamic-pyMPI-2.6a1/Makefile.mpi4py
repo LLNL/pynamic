@@ -2,7 +2,7 @@
 
 default: pynamic-mpi4py pynamic-bigexe-mpi4py
 
-PYTHON_EXE ?= $(shell which python)
+PYTHON_EXE ?= $(shell which python3)
 NUM_UTILITIES ?= $(shell ls libutility[0123456789]*.so | wc -l)
 NUM_MODULES ?= $(shell ls libmodule[0123456789]*.so | wc -l)
 
@@ -38,10 +38,10 @@ $(BIGEXE_OBJS): $(BIGEXE_SOURCES) fooN.c
 	$(CC) -DBUILD_PYNAMIC_BIGEXE -c $(CFLAGS) -o $@ $(@:.o=.c)
 
 pynamic-mpi4py: $(MAIN_OBJS) $(MODULE_LIBS) $(UTIL_LIBS)
-	$(CC) $(PYTHON_LDFLAGS) -o $@ $^ $(MODULE_LIBS) $(UTIL_LIBS) $(BASE_MODULE_LIBS) -L$(PYNAMICDIR)
+	$(CC) $(PYTHON_LDFLAGS) -o $@ $(MAIN_OBJS) $(MODULE_LIBS) $(UTIL_LIBS) $(BASE_MODULE_LIBS) -L$(PYNAMICDIR) $(LDFLAGS)
 
 pynamic-bigexe-mpi4py: $(MAIN_OBJS) $(BIGEXE_OBJS) $(MODULE_LIBS) $(UTIL_LIBS)
-	$(CC) $(PYTHON_LDFLAGS) -o $@ $(MAIN_OBJS) $(BIGEXE_OBJS) $(MODULE_LIBS) $(UTIL_LIBS) $(BASE_MODULE_LIBS) -L$(PYNAMICDIR)
+	$(CC) $(PYTHON_LDFLAGS) -o $@ $(MAIN_OBJS) $(BIGEXE_OBJS) $(MODULE_LIBS) $(UTIL_LIBS) $(BASE_MODULE_LIBS) -L$(PYNAMICDIR) $(LDFLAGS)
 
 clean:
 	rm -f pynamic-bigexe-mpi4py pynamic-mpi4py $(BIGEXE_OBJS) $(MAIN_OBJS)

@@ -55,7 +55,7 @@ if not use_mpi4py:
     command = 'make -j ' + str(processes)
     run_command(command)
 else:
-    command = 'make clean'
+    command = 'make -f Makefile.mpi4py clean'
     run_command(command)
     
     target = 'pynamic-mpi4py'
