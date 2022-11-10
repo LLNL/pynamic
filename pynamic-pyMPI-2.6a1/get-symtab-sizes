@@ -9,8 +9,6 @@
 # and produce size information.   
 #
 
-echo "Where the heck am I: $(pwd)"
-
 if test -z $LD_LIBRARY_PATH
 then
 	export LD_LIBRARY_PATH=./
